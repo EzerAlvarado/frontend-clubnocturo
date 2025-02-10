@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,107 +7,150 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert
 } from 'react-native';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { StatusBar } from 'expo-status-bar';
 import { Calendar } from 'react-native-calendars';
 import { useNavigation } from '@react-navigation/native';
-import AgregarEvento from './AgregarEvento';
 
 const AgendaEventos = () => {
   const navigation = useNavigation();
+  const [events, setEvents] = useState([]);
+
+  // Función para cargar los eventos del backend
+  const loadEvents = async () => {
+    try {
+      const response = await fetch('http://192.168.100.7:8000/club/eventos/');
+      if (!response.ok) {
+        Alert.alert("Error", "No se pudieron cargar los eventos.");
+        return;
+      }
+      const data = await response.json();
+      setEvents(data);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      Alert.alert("Error", "Error al conectar con el servidor.");
+    }
+  };
+
+  useEffect(() => {
+    loadEvents();
+  }, []);
+
+  // Función para "cargar" o ver detalles del evento (puede ser navegación a detalle)
+  const handleLoadEvent = (event) => {
+    navigation.navigate('Editar Eventos', { event });
+  };
+
+  // Función para eliminar un evento
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`http://192.168.100.7:8000/club/eventos/${id}/`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        Alert.alert("Error", "No se pudo eliminar el evento.");
+      } else {
+        Alert.alert("Éxito", "Evento eliminado correctamente.");
+        // Se vuelve a cargar la lista de eventos
+        loadEvents();
+      }
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      Alert.alert("Error", "Error al conectar con el servidor.");
+    }
+  };
+
+  // Construir el objeto markedDates para el calendario basándose en la fecha de inicio de cada evento
+  const markedDates = {};
+  events.forEach((event) => {
+    const dateKey = new Date(event.fecha_inicio_de_evento).toISOString().split('T')[0];
+    markedDates[dateKey] = {
+      customStyles: {
+        container: { backgroundColor: '#259588' },
+        text: { color: 'white' },
+      },
+    };
+  });
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.containerCalendar}>
-                <Calendar
-                  theme={{
-                    backgroundColor: '#fffdf9', // Fondo del calendario
-                    calendarBackground: '#fffdf9', // Fondo detrás del calendario
-                    textDayFontSize: 16, // Tamaño del número del día
-                    textMonthFontSize: 20, // Tamaño del mes
-                    textDayHeaderFontSize: 14, // Tamaño de los encabezados de los días (L, M, X, etc.)
-                    arrowColor: '#259588', // Color de las flechas de navegación
-
-                  }}
-                  markingType={'custom'}
-                  markedDates={{
-                    '2025-01-22' : {customStyles:{container:{backgroundColor:'#259588'}, text:{color:'white'}}}
-                  }}
-
-                  renderArrow={(direction) => (
-                    <Entypo
-                      name={direction === 'left' ? 'chevron-left' : 'chevron-right'}
-                      size={35} // Cambia el tamaño aquí
-                      color="#259588" // Cambia el color si lo deseas
-                    />
-                  )}
-                  
-   
-                
-                />
-                <StatusBar style="auto" />
-              </View>
+        <Calendar
+          theme={{
+            backgroundColor: '#fffdf9',
+            calendarBackground: '#fffdf9',
+            textDayFontSize: 16,
+            textMonthFontSize: 20,
+            textDayHeaderFontSize: 14,
+            arrowColor: '#259588',
+          }}
+          markingType={'custom'}
+          markedDates={markedDates}
+          renderArrow={(direction) => (
+            <Entypo
+              name={direction === 'left' ? 'chevron-left' : 'chevron-right'}
+              size={35}
+              color="#259588"
+            />
+          )}
+        />
+        <StatusBar style="auto" />
+      </View>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-
         <View style={styles.container}>
-
-          {/* Título */}
-              
-
           <Text style={styles.tituloLeft}>Eventos</Text>
-
-          {/* Lista de Cards */}
-          <View style={styles.card}>
-            <View style={styles.cardContent}>
-              <Text style={styles.cardFecha}>Miércoles, 1 de enero</Text>
-              <Text style={styles.cardTitulo}>Evento de Karely</Text>
-              <Text style={styles.cardSubtitulo}>Pago completado</Text>
-            </View>
-            <TouchableOpacity>
-              <Entypo name="cross" size={45} color="#ff8888" />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.card}>
-            <View style={styles.cardContent}>
-              <Text style={styles.cardFecha}>Jueves, 2 de enero</Text>
-              <Text style={styles.cardTitulo}>Evento de Juan</Text>
-              <Text style={styles.cardSubtitulo}>Pago pendiente</Text>
-            </View>
-            <TouchableOpacity >
-              <Entypo name="cross" size={45} color="#ff8888" />
-            </TouchableOpacity>
-          </View>
-
-
-          <View style={styles.card}>
-            <View style={styles.cardContent}>
-              <Text style={styles.cardFecha}>Jueves, 2 de enero</Text>
-              <Text style={styles.cardTitulo}>Evento de Juan</Text>
-              <Text style={styles.cardSubtitulo}>Pago pendiente</Text>
-            </View>
-            <TouchableOpacity >
-              <Entypo name="cross" size={45} color="#ff8888" />
-            </TouchableOpacity>
-          </View>
-
-
+          {events.map((event) => {
+            // Formatear la fecha de inicio para mostrarla (por ejemplo, "miércoles, 1 de enero")
+            const fechaInicio = new Date(event.fecha_inicio_de_evento);
+            const fechaFormatted = fechaInicio.toLocaleDateString('es-ES', {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+            });
+            return (
+              <TouchableOpacity
+                key={event.id}
+                style={styles.card}
+                onPress={() => handleLoadEvent(event)}
+              >
+                <View style={styles.cardContent}>
+                  <Text style={styles.cardFecha}>{fechaFormatted}</Text>
+                  <Text style={styles.cardTitulo}>{event.observaciones}</Text>
+                  <Text
+                    style={[
+                      styles.cardSubtitulo,
+                      { color: event.pago_renta ? '#259588' : '#ff8888' },
+                    ]}
+                  >
+                    {event.pago_renta ? 'Pago completado' : 'Pago pendiente'}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => handleDelete(event.id)}>
+                  <Entypo name="cross" size={45} color="#ff8888" />
+                </TouchableOpacity>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </ScrollView>
-
-          {/* Botón circular */}
- 
-          <TouchableOpacity style={styles.addButton}
-            onPress={() => navigation.navigate('Agregar Evento')}
-          >
-            <FontAwesome6 name="add" size={28} color="white" />
-            </TouchableOpacity>
+      <View style={styles.floatingButtons}>
+        <TouchableOpacity style={styles.reloadButton} onPress={loadEvents}>
+          <Entypo name="cycle" size={28} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => navigation.navigate('Agregar Eventos')}
+        >
+          <FontAwesome6 name="add" size={28} color="white" />
+        </TouchableOpacity>
+      </View>
     </KeyboardAvoidingView>
-
   );
 };
 
@@ -121,10 +164,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     flexGrow: 1,
     backgroundColor: '#fffdf9',
-    paddingHorizontal:20,
-
-
-
+    paddingHorizontal: 20,
   },
   tituloLeft: {
     fontSize: 20,
@@ -134,24 +174,19 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textAlign: 'left',
     paddingHorizontal: 25,
-
-
   },
-  // Cards
   card: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#fffdf9',
     borderRadius: 12,
     marginHorizontal: 20,
     marginBottom: 15,
     padding: 16,
-    backgroundColor:'#f9f6f2',
+    backgroundColor: '#f9f6f2',
     shadowColor: '#e1e1e1',
-    shadowOpacity: 1, 
-    shadowRadius: 4, 
-
+    shadowOpacity: 1,
+    shadowRadius: 4,
   },
   cardContent: {
     flex: 1,
@@ -163,8 +198,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   cardTitulo: {
-
-
     fontSize: 15,
     fontWeight: '500',
     color: '#555',
@@ -172,15 +205,7 @@ const styles = StyleSheet.create({
   cardSubtitulo: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#259588',
     marginTop: 4,
-  },
-
-  // Botón circular
-  botonArea: {
-    alignItems: 'center',
-    marginTop: 20,
-
   },
   addButton: {
     width: 55,
@@ -189,18 +214,37 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     alignItems: 'center',
     justifyContent: 'center',
-
-    position: 'absolute', // Botón fijo
-    bottom: 20, // Separación desde la parte inferior
-    right: 150, // Separación desde el borde derecho
+    position: 'absolute',
+    bottom: 20,
+    right: 150,
     left: 150,
     alignSelf: 'center',
   },
-  addButtonText: {
-    fontSize: 30,
-    fontWeight: '700',
-    color: '#fff',
+  floatingButtons: {
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+    flexDirection: 'row',
   },
+  reloadButton: {
+    width: 55,
+    height: 55,
+    borderRadius: 30,
+    backgroundColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 20,
+  },
+  addButton: {
+    width: 55,
+    height: 55,
+    borderRadius: 30,
+    backgroundColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 20,
+  },
+  
 });
 
 export default AgendaEventos;
