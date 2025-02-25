@@ -1,11 +1,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import MenuBebidas from './MenuBebidas';
-import { NavigationContainer } from '@react-navigation/native';
 
 const Bloques = ({ navigation }) => {
-  const navigateToMenu = () => {
-    navigation.navigate('MenuBebidas');
+  // Función para navegar a la pantalla de MenuBebidas con la mesa seleccionada
+  const navigateToMenu = (mesa) => {
+    navigation.navigate('Menu', { mesa }); // Pasar la mesa seleccionada
   };
 
   return (
@@ -16,19 +15,19 @@ const Bloques = ({ navigation }) => {
         <View style={styles.rowContainer}>
           <TouchableOpacity
             style={[styles.button, styles.greenButton]}
-            onPress={navigateToMenu}
+            onPress={() => navigateToMenu("M1")} // Pasar "M1"
           >
             <Text style={styles.buttonText}>M1</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, styles.greenButton]}
-            onPress={navigateToMenu}
+            onPress={() => navigateToMenu("M2")} // Pasar "M2"
           >
             <Text style={styles.buttonText}>M2</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, styles.greenButton]}
-            onPress={navigateToMenu}
+            onPress={() => navigateToMenu("M3")} // Pasar "M3"
           >
             <Text style={styles.buttonText}>M3</Text>
           </TouchableOpacity>
@@ -36,19 +35,19 @@ const Bloques = ({ navigation }) => {
         <View style={styles.rowContainer}>
           <TouchableOpacity
             style={[styles.button, styles.greenButton]}
-            onPress={navigateToMenu}
+            onPress={() => navigateToMenu("M4")} // Pasar "M4"
           >
             <Text style={styles.buttonText}>M4</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, styles.greenButton]}
-            onPress={navigateToMenu}
+            onPress={() => navigateToMenu("M5")} // Pasar "M5"
           >
             <Text style={styles.buttonText}>M5</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, styles.greenButton]}
-            onPress={navigateToMenu}
+            onPress={() => navigateToMenu("M6")} // Pasar "M6"
           >
             <Text style={styles.buttonText}>M6</Text>
           </TouchableOpacity>
@@ -59,19 +58,19 @@ const Bloques = ({ navigation }) => {
         <View style={styles.rowContainer}>
           <TouchableOpacity
             style={[styles.button, styles.redButton]}
-            onPress={navigateToMenu}
+            onPress={() => navigateToMenu("B1")} // Pasar "B1"
           >
             <Text style={styles.buttonText}>B1</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, styles.redButton]}
-            onPress={navigateToMenu}
+            onPress={() => navigateToMenu("B2")} // Pasar "B2"
           >
             <Text style={styles.buttonText}>B2</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, styles.redButton]}
-            onPress={navigateToMenu}
+            onPress={() => navigateToMenu("B3")} // Pasar "B3"
           >
             <Text style={styles.buttonText}>B3</Text>
           </TouchableOpacity>
@@ -81,6 +80,7 @@ const Bloques = ({ navigation }) => {
   );
 };
 
+// Estilos (sin cambios)
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -2,6 +2,7 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
+import { createStackNavigator } from '@react-navigation/stack';
 import { View, Text, StyleSheet } from 'react-native';
 import Home from './screens/Home';
 import Login from './screens/Login';
@@ -13,7 +14,9 @@ import AgendaEventos from './screens/AgendaEventos';
 import AgregarEvento from './screens/AgregarEvento';
 import EditarEvento from './screens/EditarEvento';
 
+
 const Drawer = createDrawerNavigator();
+const Stack = createStackNavigator();
 
 // Componente personalizado para el contenido del Drawer
 function CustomDrawerContent(props) {
@@ -30,7 +33,7 @@ function CustomDrawerContent(props) {
             {/* Footer con opción de cerrar sesión */}
             <View style={styles.footer}>
                 <DrawerItem
-                    label="cerrar sesión"
+                    label="Cerrar sesión"
                     labelStyle={styles.logoutText}
                     onPress={() => console.log('Cerrar sesión')}
                 />
@@ -39,36 +42,49 @@ function CustomDrawerContent(props) {
     );
 }
 
+// Drawer Navigator
+function DrawerNavigator() {
+    return (
+        <Drawer.Navigator
+            drawerContent={(props) => <CustomDrawerContent {...props} />}
+            screenOptions={{
+                drawerStyle: {
+                    backgroundColor: '#18243a', // Fondo del Drawer
+                    width: 240,
+                },
+                drawerLabelStyle: {
+                    color: 'white', // Texto de los elementos del Drawer
+                },
+                headerStyle: {
+                    backgroundColor: '#18243a',
+                },
+                headerTintColor: 'white',
+            }}
+        >
+            <Drawer.Screen name="Login" component={Login} />
+            <Drawer.Screen name="Home" component={Home} />
+            <Drawer.Screen name="Barman" component={BarModule} />
+            <Drawer.Screen name="Bloques" component={Bloques} />
+            <Drawer.Screen name="Agenda Eventos" component={AgendaEventos} />
+        </Drawer.Navigator>
+    );
+}
+
+// Configuración principal con Stack Navigator
 export default function App() {
     return (
         <NavigationContainer>
-            <Drawer.Navigator
-                drawerContent={(props) => <CustomDrawerContent {...props} />}
-                screenOptions={{
-                    drawerStyle: {
-                        backgroundColor: '#18243a', // Fondo del Drawer
-                        width: 240,
-                    },
-                    drawerLabelStyle: {
-                        color: 'white', // Texto de los elementos del Drawer
-                    },
-                    headerShown: true, // Mostrar el header para debug
-                    headerStyle: {
-                        backgroundColor: '#18243a',
-                    },
-                    headerTintColor: 'white',
-                }}
-            >
-                <Drawer.Screen name="Home" component={Home} />
-                <Drawer.Screen name="Login" component={Login} />
-                <Drawer.Screen name="Barman" component={BarModule} />
-                <Drawer.Screen name="Ticket" component={TicketScreen} />
-                <Drawer.Screen name='Bloques' component={Bloques}/>
-                <Drawer.Screen name='Menu' component={MenuBebidas}/>
-                <Drawer.Screen name='Agenda Eventos' component={AgendaEventos}/>
-                <Drawer.Screen name='Agregar Eventos' component={AgregarEvento}/>
-                <Drawer.Screen name='Editar Eventos' component={EditarEvento}/>
-            </Drawer.Navigator>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+                {/* Anidar el Drawer Navigator */}
+                <Stack.Screen name="Drawer" component={DrawerNavigator} />
+
+                {/* Agregar pantallas que no están en el Drawer */}
+                <Stack.Screen name="Ticket" component={TicketScreen} />
+                <Stack.Screen name="Menu" component={MenuBebidas} />
+                <Stack.Screen name="Bloque" component={Bloques} />
+                <Stack.Screen name="Editar" component={EditarEvento} />
+                <Stack.Screen name="Agregar" component={AgregarEvento} />
+            </Stack.Navigator>
         </NavigationContainer>
     );
 }

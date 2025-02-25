@@ -41,7 +41,7 @@ const AgregarEvento = () => {
 
   // Efecto para obtener los bloques desde la API
   React.useEffect(() => {
-    fetch('http://192.168.100.7:8000/club/bloques/')
+    fetch('http://127.0.0.1:8000/club/bloques/')
       .then((response) => response.json())
       .then((data) => {
         setBloques(data);
@@ -113,7 +113,7 @@ const AgregarEvento = () => {
     };
 
     try {
-      const response = await fetch('http://192.168.100.7:8000/club/eventos/', {
+      const response = await fetch('http://127.0.0.1:8000/club/eventos/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

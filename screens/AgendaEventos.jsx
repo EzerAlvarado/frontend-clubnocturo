@@ -22,7 +22,7 @@ const AgendaEventos = () => {
   // Función para cargar los eventos del backend
   const loadEvents = async () => {
     try {
-      const response = await fetch('http://192.168.100.7:8000/club/eventos/');
+      const response = await fetch('http://127.0.0.1:8000/club/eventos/');
       if (!response.ok) {
         Alert.alert("Error", "No se pudieron cargar los eventos.");
         return;
@@ -41,13 +41,13 @@ const AgendaEventos = () => {
 
   // Función para "cargar" o ver detalles del evento (puede ser navegación a detalle)
   const handleLoadEvent = (event) => {
-    navigation.navigate('Editar Eventos', { event });
+    navigation.navigate('Editar', { event });
   };
 
   // Función para eliminar un evento
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://192.168.100.7:8000/club/eventos/${id}/`, {
+      const response = await fetch(`http://127.0.0.1:8000/club/eventos/${id}/`, {
         method: 'DELETE',
       });
       if (!response.ok) {
@@ -145,7 +145,7 @@ const AgendaEventos = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => navigation.navigate('Agregar Eventos')}
+          onPress={() => navigation.navigate('Agregar')}
         >
           <FontAwesome6 name="add" size={28} color="white" />
         </TouchableOpacity>
