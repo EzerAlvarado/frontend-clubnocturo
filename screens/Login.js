@@ -25,7 +25,7 @@ const Login = () => {
       const usuarioEncontrado = usuarios.find(
         (usuario) =>
           usuario.correo_cliente.toLowerCase() === email.toLowerCase() &&
-          usuario.numero_de_celular.toString() === password
+          usuario.contrasena.toString() === password
       );
 
       if (usuarioEncontrado) {
