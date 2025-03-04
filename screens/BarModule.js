@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, Button, ScrollView, ActivityIndicator } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import API_URL from "../url";
 
 const BartenderScreen = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true); // Estado para manejar la carga
+  // Variable de IP 
+  const IP = API_URL;
 
   // Función para obtener las órdenes desde la API
   const fetchOrders = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/club/ordenes-de-compra/");
+      const response = await fetch(`http://${IP}:8000/club/ordenes-de-compra/`);
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
@@ -34,7 +37,7 @@ const BartenderScreen = () => {
 
       // Marcar cada orden como completada
       for (const order of mesaOrders) {
-        const response = await fetch(`http://127.0.0.1:8000/club/ordenes-de-compra/${order.id}/`, {
+        const response = await fetch(`http://${IP}:8000/club/ordenes-de-compra/${order.id}/`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
@@ -98,11 +101,12 @@ const BartenderScreen = () => {
                   </View>
                 ))}
                 <View style={styles.buttonContainer}>
-                  <Button
-                    title="Completado"
-                    color="#003366"
+                  <TouchableOpacity 
+                    style={styles.completeButton}
                     onPress={() => handleCompleteOrder(mesa)}
-                  />
+                  >
+                    <Text style={styles.completeButtonText}>Completar</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
@@ -163,6 +167,17 @@ const styles = StyleSheet.create({
     marginTop: 10,
     alignSelf: "flex-end",
     width: 120,
+  },
+  completeButton: {
+    backgroundColor: "#003366",
+    paddingVertical: 10,
+    borderRadius: 12, //  redondeado
+    alignItems: "center",
+  },
+  completeButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   noOrdersText: {
     fontSize: 18,

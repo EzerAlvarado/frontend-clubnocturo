@@ -14,15 +14,19 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { StatusBar } from 'expo-status-bar';
 import { Calendar } from 'react-native-calendars';
 import { useNavigation } from '@react-navigation/native';
+import API_URL from '../url';
 
 const AgendaEventos = () => {
   const navigation = useNavigation();
   const [events, setEvents] = useState([]);
 
+  // Variable de IP 
+  const IP = API_URL;
+
   // Función para cargar los eventos del backend
   const loadEvents = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/club/eventos/');
+      const response = await fetch(`http://${IP}:8000/club/eventos/`);
       if (!response.ok) {
         Alert.alert("Error", "No se pudieron cargar los eventos.");
         return;
@@ -47,7 +51,7 @@ const AgendaEventos = () => {
   // Función para eliminar un evento
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/club/eventos/${id}/`, {
+      const response = await fetch(`http://${IP}:8000/club/eventos/${id}/`, {
         method: 'DELETE',
       });
       if (!response.ok) {
@@ -131,12 +135,17 @@ const AgendaEventos = () => {
                     {event.pago_renta ? 'Pago completado' : 'Pago pendiente'}
                   </Text>
                 </View>
+                
+
+
                 <TouchableOpacity onPress={() => handleDelete(event.id)}>
                   <Entypo name="cross" size={45} color="#ff8888" />
                 </TouchableOpacity>
               </TouchableOpacity>
+              
             );
           })}
+          <View style={styles.bottomContent}></View>
         </View>
       </ScrollView>
       <View style={styles.floatingButtons}>
@@ -191,6 +200,11 @@ const styles = StyleSheet.create({
   cardContent: {
     flex: 1,
   },
+  bottomContent: {
+    flex: 1,
+    paddingTop: 35,
+
+  },
   cardFecha: {
     fontSize: 18,
     fontWeight: '700',
@@ -219,6 +233,7 @@ const styles = StyleSheet.create({
     right: 150,
     left: 150,
     alignSelf: 'center',
+
   },
   floatingButtons: {
     position: 'absolute',
@@ -234,6 +249,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 20,
+    opacity: 0.85,
+
   },
   addButton: {
     width: 55,
@@ -243,6 +260,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 20,
+    opacity: 0.85,
   },
   
 });

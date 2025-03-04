@@ -14,7 +14,7 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
-
+import API_URL from '../url';
 
 const EditarEvento = () => {
   const route = useRoute();
@@ -35,16 +35,22 @@ const EditarEvento = () => {
   // Asumimos que "bloque" es un arreglo; usamos el primer elemento
   const [numero, setNumero] = React.useState(event.bloque[0] ? event.bloque[0].toString() : '');
 
+  // Estados para los datos del Rentador, se inicializan con lo recibido o con cadena vacía
+  const [nombreRentador, setNombreRentador] = React.useState(event.nombre_rentador );
+  const [correoRentador, setCorreoRentador] = React.useState(event.correo_rentador );
+
   // Estado para almacenar los bloques obtenidos de la API
   const [bloques, setBloques] = React.useState([]);
-  // Efecto para obtener los bloques desde la API
-    React.useEffect(() => {
-      fetch('http://127.0.0.1:8000/club/bloques/')
-        .then((response) => response.json())
-        .then((data) => setBloques(data))
-        .catch((error) => console.error('Error al obtener bloques:', error));
-    }, []);
+  // Variable de IP 
+  const IP = API_URL;
 
+  // Efecto para obtener los bloques desde la API
+  React.useEffect(() => {
+    fetch(`http://${IP}:8000/club/bloques/`)
+      .then((response) => response.json())
+      .then((data) => setBloques(data))
+      .catch((error) => console.error('Error al obtener bloques:', error));
+  }, []);
 
   // Handlers para Fecha Inicio
   const onChangeFechaInicioDate = (e, selectedDate) => {
@@ -86,13 +92,21 @@ const EditarEvento = () => {
 
   // Función para actualizar el evento
   const handleActualizar = async () => {
-    // Validaciones
-    if (!nombre.trim() || !numero.trim()) {
-      alert("Error: Por favor, complete los campos requeridos: Nombre y Número.");
+    // Validaciones de campos requeridos: Nombre, Número, Nombre del Rentador y Correo del Rentador
+    if (!nombre.trim() || !numero.trim() || !nombreRentador.trim() || !correoRentador.trim()) {
+      alert("Error: Por favor, complete los campos requeridos: Nombre, Número, Nombre del Rentador y Correo del Rentador.");
       return;
     }
     if (fechaInicio > fechaFin) {
       alert("Error: La fecha de inicio no puede ser posterior a la fecha final.");
+      return;
+    }
+        // Agrega esta validación al inicio de la función handleActualizar, justo después de la validación de campos requeridos:
+    const hoy = new Date();
+    const fechaActual = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    const fechaInicioEvento = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), fechaInicio.getDate());
+    if (fechaInicioEvento < fechaActual) {
+      alert("Error: La fecha de inicio no puede ser anterior al día de hoy.");
       return;
     }
 
@@ -102,12 +116,13 @@ const EditarEvento = () => {
       fecha_final_de_evento: fechaFin.toISOString(),
       observaciones: nombre,
       bloque: [parseInt(numero, 10)],
-      cliente_rentador: 1,
+      nombre_rentador: nombreRentador,
+      correo_rentador: correoRentador,
     };
 
     try {
       // Usamos el método PUT para actualizar el evento
-      const response = await fetch(`http://127.0.0.1:8000/club/eventos/${event.id}/`, {
+      const response = await fetch(`http://${IP}:8000/club/eventos/${event.id}/`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -127,7 +142,7 @@ const EditarEvento = () => {
       console.error('Error al conectar:', error);
       alert("Error: Error al conectar con el servidor.");
     }
-    navigation.navigate('Agenda Eventos')
+    navigation.navigate('Agenda Eventos');
   };
 
   return (
@@ -209,7 +224,7 @@ const EditarEvento = () => {
               />
             )}
 
-            {/* Input de observaciones (Nombre) */}
+            {/* Input de observaciones (Nombre del evento) */}
             <Text style={styles.inputLabel}>Nombre</Text>
             <TextInput
               style={styles.inputDesign}
@@ -219,23 +234,44 @@ const EditarEvento = () => {
               onChangeText={setNombre}
             />
 
-          {/* Input de bloque (Número) con lista desplegable */}
-          <Text style={styles.inputLabel}>Número</Text>
-          <View style={styles.inputDesign}>
-            <Picker
-              selectedValue={numero}
-              onValueChange={(itemValue) => setNumero(itemValue)}
-            >
-              <Picker.Item label="Seleccione un bloque" value="" />
-              {bloques.map((bloque) => (
-                <Picker.Item
-                  key={bloque.id}
-                  label={bloque.descripcion}
-                  value={bloque.id.toString()}
-                />
-              ))}
-            </Picker>
-          </View>
+            {/* Input de bloque (Número) con lista desplegable */}
+            <Text style={styles.inputLabel}>Número</Text>
+            <View style={styles.inputDesign}>
+              <Picker
+                selectedValue={numero}
+                onValueChange={(itemValue) => setNumero(itemValue)}
+              >
+                <Picker.Item label="Seleccione un bloque" value="" />
+                {bloques.map((bloque) => (
+                  <Picker.Item
+                    key={bloque.id}
+                    label={bloque.descripcion}
+                    value={bloque.id.toString()}
+                  />
+                ))}
+              </Picker>
+            </View>
+
+            {/* Input para Nombre del Rentador */}
+            <Text style={styles.inputLabel}>Nombre del Rentador</Text>
+            <TextInput
+              style={styles.inputDesign}
+              placeholder="Ingrese el nombre del rentador"
+              maxLength={150}
+              value={nombreRentador}
+              onChangeText={setNombreRentador}
+            />
+
+            {/* Input para Correo del Rentador */}
+            <Text style={styles.inputLabel}>Correo del Rentador</Text>
+            <TextInput
+              style={styles.inputDesign}
+              placeholder="Ingrese el correo del rentador"
+              keyboardType="email-address"
+              maxLength={150}
+              value={correoRentador}
+              onChangeText={setCorreoRentador}
+            />
 
             {/* Switch para Estado de pago */}
             <View style={styles.switchContainer}>
@@ -253,7 +289,7 @@ const EditarEvento = () => {
             <TouchableOpacity style={styles.btnGreen} onPress={handleActualizar}>
               <Text style={styles.btnText}>Actualizar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.btnCancel} onPress={() => navigation.navigate('Agenda Eventos')}>
+            <TouchableOpacity style={styles.btnCancel} onPress={() => navigation.goBack()}>
               <Text style={styles.btnCancelText}>Cancelar</Text>
             </TouchableOpacity>
           </View>

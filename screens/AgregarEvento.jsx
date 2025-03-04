@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { useRoute, useNavigation } from '@react-navigation/native';
 
 import {
   StyleSheet,
@@ -14,9 +15,12 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker'; // Importación del Picker
-
+import API_URL from '../url';
 
 const AgregarEvento = () => {
+
+  const route = useRoute();
+  const navigation = useNavigation();
   // Estados para fecha y hora de inicio y finalización
   const [fechaInicio, setFechaInicio] = React.useState(new Date());
   const [fechaFin, setFechaFin] = React.useState(new Date());
@@ -36,12 +40,19 @@ const AgregarEvento = () => {
   const [nombre, setNombre] = React.useState('');
   const [numero, setNumero] = React.useState('');
 
+  // Estados para los nuevos campos: nombre_rentador y correo_rentador
+  const [nombreRentador, setNombreRentador] = React.useState('');
+  const [correoRentador, setCorreoRentador] = React.useState('');
+
   // Estado para almacenar los bloques obtenidos de la API
   const [bloques, setBloques] = React.useState([]);
 
+  // Variable de IP 
+  const IP = API_URL;
+
   // Efecto para obtener los bloques desde la API
   React.useEffect(() => {
-    fetch('http://127.0.0.1:8000/club/bloques/')
+    fetch(`http://${IP}:8000/club/bloques/`)
       .then((response) => response.json())
       .then((data) => {
         setBloques(data);
@@ -91,15 +102,23 @@ const AgregarEvento = () => {
 
   // Función para enviar los datos al backend con validaciones y alertas
   const handleGuardar = async () => {
-    // Validación de campos requeridos (Nombre y Número)
-    if (!nombre.trim() || !numero.trim()) {
-      alert("Error Por favor, complete los campos requeridos: Nombre y Número.");
+    // Validación de campos requeridos (Nombre, Número, Nombre Rentador y Correo Rentador)
+    if (!nombre.trim() || !numero.trim() || !nombreRentador.trim() || !correoRentador.trim()) {
+      alert("Error: Por favor, complete los campos requeridos: Nombre, Número, Nombre del Rentador y Correo del Rentador.");
       return;
     }
 
     // Validación: la fecha de inicio no puede ser posterior a la fecha final
     if (fechaInicio > fechaFin) {
-      alert("Error La fecha de inicio no puede ser posterior a la fecha final.");
+      alert("Error: La fecha de inicio no puede ser posterior a la fecha final.");
+      return;
+    }
+    // evitar Fechas pasadas
+    const hoy = new Date();
+    const fechaActual = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    const fechaInicioEvento = new Date(fechaInicio.getFullYear(), fechaInicio.getMonth(), fechaInicio.getDate());
+    if (fechaInicioEvento < fechaActual) {
+      alert("Error: La fecha de inicio no puede ser anterior al día de hoy.");
       return;
     }
 
@@ -109,11 +128,12 @@ const AgregarEvento = () => {
       fecha_final_de_evento: fechaFin.toISOString(),
       observaciones: nombre,
       bloque: [parseInt(numero, 10)],
-      cliente_rentador: 1,
+      nombre_rentador: nombreRentador,
+      correo_rentador: correoRentador,
     };
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/club/eventos/', {
+      const response = await fetch(`http://${IP}:8000/club/eventos/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -124,19 +144,21 @@ const AgregarEvento = () => {
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Error al guardar:', errorData);
-        alert("Error No se pudo guardar el evento. Verifique los datos e inténtelo de nuevo.");
+        alert("Error: No se pudo guardar el evento. Verifique los datos e inténtelo de nuevo.");
       } else {
         const data = await response.json();
         console.log('Evento guardado:', data);
-        alert("Éxito Evento guardado correctamente.");
+        alert("Éxito: Evento guardado correctamente.");
         // Reiniciar campos a sus valores por defecto (excepto las fechas)
         setPago(false);
         setNombre('');
         setNumero('');
+        setNombreRentador('');
+        setCorreoRentador('');
       }
     } catch (error) {
       console.error('Error al conectar:', error);
-      alert("Error Error al conectar con el servidor.");
+      alert("Error: Error al conectar con el servidor.");
     }
   };
 
@@ -224,7 +246,7 @@ const AgregarEvento = () => {
             )}
 
             {/* Input de observaciones (Nombre) */}
-            <Text style={styles.inputLabel}>Nombre</Text>
+            <Text style={styles.inputLabel}>Nombre del Evento</Text>
             <TextInput
               style={styles.inputDesign}
               placeholder="Ingrese el nombre del evento"
@@ -251,6 +273,27 @@ const AgregarEvento = () => {
               </Picker>
             </View>
 
+            {/* Input para Nombre del Rentador */}
+            <Text style={styles.inputLabel}>Nombre del Rentador</Text>
+            <TextInput
+              style={styles.inputDesign}
+              placeholder="Ingrese el nombre del rentador"
+              maxLength={150}
+              value={nombreRentador}
+              onChangeText={setNombreRentador}
+            />
+
+            {/* Input para Correo del Rentador */}
+            <Text style={styles.inputLabel}>Correo del Rentador</Text>
+            <TextInput
+              style={styles.inputDesign}
+              placeholder="Ingrese el correo del rentador"
+              keyboardType="email-address"
+              maxLength={150}
+              value={correoRentador}
+              onChangeText={setCorreoRentador}
+            />
+
             {/* Switch para Estado de pago */}
             <View style={styles.switchContainer}>
               <Text style={styles.inputLabel}>Estado de pago:</Text>
@@ -266,6 +309,9 @@ const AgregarEvento = () => {
           <View style={styles.botonArea}>
             <TouchableOpacity style={styles.btnGreen} onPress={handleGuardar}>
               <Text style={styles.btnText}>Guardar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.btnCancel} onPress={() => navigation.goBack()}>
+              <Text style={styles.btnCancelText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -301,9 +347,8 @@ const styles = StyleSheet.create({
   botonArea: {
     marginBottom: 46,
     paddingTop: 1,
-    alignItems: "center",
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-around",
   },
   inputLabel: {
     fontSize: 17,
@@ -339,9 +384,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 16,
     backgroundColor: "#259588",
-    width: 180,
+    width: 150,
     height: 60,
-    marginHorizontal: 25,
+    marginHorizontal: 10,
   },
   btnText: {
     fontSize: 18,
@@ -359,6 +404,20 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontWeight: "500",
     color: "#222",
+  },
+  btnCancel: {
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 16,
+    backgroundColor: "#aaa",
+    width: 150,
+    height: 60,
+    marginHorizontal: 10,
+  },
+  btnCancelText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#fff",
   },
 });
 

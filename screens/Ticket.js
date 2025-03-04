@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import API_URL from '../url';
+//const API_URL = 'http://127.0.0.1:8000/club/cargos/'; // Ajusta la URL según tu API
 
-const API_URL = 'http://127.0.0.1:8000/club/cargos/'; // Ajusta la URL según tu API
+// Variable de IP 
+const IP = API_URL;
+
 
 const TicketScreen = ({ route, navigation }) => {
   const [ticket, setTicket] = useState(null);
@@ -20,7 +24,7 @@ const TicketScreen = ({ route, navigation }) => {
       setTicket(ticketData);
 
       // Obtener los productos asociados al ticket
-      const productosResponse = await fetch(`http://127.0.0.1:8000/club/ordenes-de-compra/?mesa=${route.params.mesaId}`);
+      const productosResponse = await fetch(`http://${IP}:8000/club/ordenes-de-compra/?mesa=${route.params.mesaId}`);
       if (!productosResponse.ok) {
         throw new Error(`Error ${productosResponse.status}: ${productosResponse.statusText}`);
       }
@@ -51,7 +55,7 @@ const TicketScreen = ({ route, navigation }) => {
   const handleCobrar = async () => {
     try {
       // Actualizar el estado del ticket a "Cobrado"
-      const response = await fetch(`${API_URL}${ticket.id}/`, {
+      const response = await fetch(`http://${IP}:8000/club/cargos/${ticket.id}/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -64,7 +68,7 @@ const TicketScreen = ({ route, navigation }) => {
       }
 
       // Guardar el ticket en la tabla "tickets"
-      const saveTicketResponse = await fetch('http://127.0.0.1:8000/club/tickets/', {
+      const saveTicketResponse = await fetch(`http://${IP}:8000/club/tickets/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
