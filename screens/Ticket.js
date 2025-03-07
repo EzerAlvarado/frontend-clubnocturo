@@ -1,88 +1,147 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import API_URL from '../url';
-//const API_URL = 'http://127.0.0.1:8000/club/cargos/'; // Ajusta la URL según tu API
 
-// Variable de IP 
-const IP = API_URL;
-
+// URLs de los endpoints
+const API_URLS = {
+  ordenesDeCompra: "http://127.0.0.1:8000/club/ordenes-de-compra/",
+  cargos: "http://127.0.0.1:8000/club/cargos/",
+  tickets: "http://127.0.0.1:8000/club/tickets/",
+};
 
 const TicketScreen = ({ route, navigation }) => {
   const [ticket, setTicket] = useState(null);
   const [productos, setProductos] = useState([]);
+  const [totalMesa, setTotalMesa] = useState(0); // Estado para el total de la mesa
   const [loading, setLoading] = useState(true);
 
-  // Función para obtener el ticket y los productos asociados
   const fetchTicket = async () => {
     try {
-      // Obtener el ticket
-      const response = await fetch(`${API_URL}${route.params.mesaId}/`);
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      const mesaId = route.params.mesaId;
+      if (!mesaId) {
+        throw new Error("No se proporcionó un ID de mesa válido.");
       }
-      const ticketData = await response.json();
-      setTicket(ticketData);
-
-      // Obtener los productos asociados al ticket
-      const productosResponse = await fetch(`http://${IP}:8000/club/ordenes-de-compra/?mesa=${route.params.mesaId}`);
-      if (!productosResponse.ok) {
-        throw new Error(`Error ${productosResponse.status}: ${productosResponse.statusText}`);
+  
+      // Obtener las órdenes de compra para la mesa específica
+      const ordenesResponse = await fetch(`${API_URLS.ordenesDeCompra}?mesas=${mesaId}`);
+      if (!ordenesResponse.ok) {
+        throw new Error(`Error ${ordenesResponse.status}: ${response.statusText}`);
       }
-      const productosData = await productosResponse.json();
-
-      // Acumular productos repetidos
-      const productosAcumulados = productosData.reduce((acc, producto) => {
-        const productoExistente = acc.find((p) => p.producto.id === producto.producto.id);
-        if (productoExistente) {
-          productoExistente.cantidad += producto.cantidad;
-          productoExistente.precio_orden += producto.precio_orden;
-        } else {
-          acc.push({ ...producto });
+      const ordenesData = await ordenesResponse.json();
+      console.log("Órdenes de compra:", ordenesData); // Depuración
+  
+      // Filtrar y acumular productos para la mesa específica
+      const productosAcumulados = ordenesData.reduce((acc, orden) => {
+        if (orden.mesas === mesaId) {
+          const productoExistente = acc.find((p) => p.producto === orden.producto);
+          if (productoExistente) {
+            productoExistente.cantidad += orden.cantidad;
+            productoExistente.precio_orden += parseFloat(orden.precio_orden);
+          } else {
+            acc.push({
+              ...orden,
+              precio_orden: parseFloat(orden.precio_orden),
+            });
+          }
         }
         return acc;
       }, []);
-
+  
       setProductos(productosAcumulados);
+  
+      // Obtener el ticket (cargo) asociado a la mesa específica
+      const cargosResponse = await fetch(`${API_URLS.cargos}?mesa=${mesaId}`);
+      if (!cargosResponse.ok) {
+        throw new Error(`Error ${cargosResponse.status}: ${cargosResponse.statusText}`);
+      }
+      const cargosData = await cargosResponse.json();
+      console.log("Cargos:", cargosData); // Depuración
+  
+      // Verificar si hay un cargo para la mesa
+      if (cargosData.length > 0) {
+        const cargoMesa = cargosData.find((cargo) => cargo.mesa === mesaId);
+        if (cargoMesa) {
+          setTicket(cargoMesa); // Usar el cargo encontrado para la mesa
+        } else {
+          // Si no hay un cargo para la mesa, mostrar un Alert
+          Alert.alert(
+            'Aviso',
+            'No se encontró un ticket para esta mesa.',
+            [
+              {
+                text: 'Aceptar',
+                onPress: () => navigation.goBack(), // Regresar a la pantalla anterior
+              },
+            ],
+            { cancelable: false }
+          );
+        }
+      } else {
+        // Si no hay cargos, mostrar un Alert
+        Alert.alert(
+          'Aviso',
+          'No se encontró un ticket para esta mesa.',
+          [
+            {
+              text: 'Aceptar',
+              onPress: () => navigation.goBack(), // Regresar a la pantalla anterior
+            },
+          ],
+          { cancelable: false }
+        );
+      }
     } catch (error) {
       console.error('Error al obtener el ticket o los productos:', error);
-      Alert.alert('Error', 'No se pudo cargar el ticket. Inténtalo de nuevo.');
+      Alert.alert(
+        'Error',
+        'No se pudo cargar el ticket. Inténtalo de nuevo.',
+        [
+          {
+            text: 'Aceptar',
+            onPress: () => navigation.goBack(), // Regresar a la pantalla anterior
+          },
+        ],
+        { cancelable: false }
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  // Función para cobrar el ticket
   const handleCobrar = async () => {
     try {
-      // Actualizar el estado del ticket a "Cobrado"
-      const response = await fetch(`http://${IP}:8000/club/cargos/${ticket.id}/`, {
+      if (!ticket) {
+        throw new Error("No hay un ticket para cobrar.");
+      }
+
+      // Actualizar el estado del cargo a "cobrado"
+      const updateCargoResponse = await fetch(`${API_URLS.cargos}${ticket.id}/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ estado: 'Cobrado' }),
+        body: JSON.stringify({ estado: 'cobrado' }),
       });
 
-      if (!response.ok) {
-        throw new Error('Error al cobrar el ticket');
+      if (!updateCargoResponse.ok) {
+        throw new Error('Error al actualizar el estado del cargo');
       }
 
-      // Guardar el ticket en la tabla "tickets"
-      const saveTicketResponse = await fetch(`http://${IP}:8000/club/tickets/`, {
+      // Crear un nuevo ticket en la tabla de tickets
+      const createTicketResponse = await fetch(API_URLS.tickets, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          mesa_id: ticket.mesa_id,
-          total_cobro: ticket.total_cobro,
-          estado: 'Cobrado',
+          total_cobro: totalMesa, // Usar el total calculado para la mesa
           usuario_responsable: ticket.usuario_responsable,
+          estado: 'cobrado',
+          mesa: ticket.mesa,
         }),
       });
 
-      if (!saveTicketResponse.ok) {
-        throw new Error('Error al guardar el ticket en la tabla tickets');
+      if (!createTicketResponse.ok) {
+        throw new Error('Error al crear el ticket');
       }
 
       Alert.alert('Éxito', 'Ticket cobrado y guardado correctamente.');
@@ -109,11 +168,7 @@ const TicketScreen = ({ route, navigation }) => {
   }
 
   if (!ticket) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>No se encontró el ticket.</Text>
-      </View>
-    );
+    return null; // No mostrar nada si no hay ticket
   }
 
   return (
@@ -122,35 +177,30 @@ const TicketScreen = ({ route, navigation }) => {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Text style={styles.backButtonText}>Regresar</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ticket - Mesa {ticket.mesa_id}</Text>
+        <Text style={styles.headerTitle}>Ticket - Mesa {ticket.mesa}</Text>
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Mostrar el ID de la mesa */}
-        <Text style={styles.mesaText}>Mesa ID: {ticket.mesa_id}</Text>
+        <Text style={styles.mesaText}>Mesa ID: {ticket.mesa}</Text>
         <View style={styles.divider} />
 
-        {/* Mostrar los productos */}
         <Text style={styles.sectionTitle}>Productos:</Text>
         {productos.map((producto, index) => (
           <View key={index} style={styles.productoItem}>
             <Text style={styles.productoText}>
-              {producto.producto.nombre_producto} - Cantidad: {producto.cantidad} - Total: ${producto.precio_orden}
+              {producto.nombre_producto} - Cantidad: {producto.cantidad} - Total: ${producto.precio_orden.toFixed(2)}
             </Text>
           </View>
         ))}
         <View style={styles.divider} />
 
-        {/* Mostrar el total */}
-        <Text style={styles.totalText}>Total: ${ticket.total_cobro}</Text>
+        <Text style={styles.totalText}>Total: ${totalMesa.toFixed(2)}</Text> {/* Mostrar el total de la mesa */}
         <View style={styles.divider} />
 
-        {/* Mostrar el estado */}
         <Text style={styles.footerText}>Estado: {ticket.estado}</Text>
       </ScrollView>
 
-      {/* Botón de cobrar si el estado es "Pendiente" */}
-      {ticket.estado === 'Pendiente' && (
+      {ticket.estado === 'pendiente' && (
         <View style={styles.footer}>
           <Text style={styles.footerText}>Seleccione la opción de cobrar una vez terminada la orden</Text>
           <TouchableOpacity style={styles.button} onPress={handleCobrar}>

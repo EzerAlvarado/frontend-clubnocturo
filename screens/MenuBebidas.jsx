@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, ScrollView, Alert, TextInput } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { AuthContext } from '../AuthContext';
 import API_URL from '../url';
-
 
 const MenuBebidas = ({ navigation, route }) => {
   const { mesa } = route.params;
@@ -14,6 +13,7 @@ const MenuBebidas = ({ navigation, route }) => {
   const [productosFiltrados, setProductosFiltrados] = useState([]);
   const [productosSeleccionados, setProductosSeleccionados] = useState([]);
   const [quantities, setQuantities] = useState({});
+  const [nota, setNota] = useState('');
 
   // Variable de IP 
   const IP = API_URL;
@@ -60,22 +60,35 @@ const MenuBebidas = ({ navigation, route }) => {
     }));
   };
 
-  const agregarProducto = (producto) => {
-    if (quantities[producto.id] > 0) {
-      setProductosSeleccionados(prev => {
-        const index = prev.findIndex(p => p.id === producto.id);
-        if (index !== -1) {
-          const nuevosProductos = [...prev];
-          nuevosProductos[index].cantidad += quantities[producto.id];
-          return nuevosProductos;
-        }
-        return [...prev, { ...producto, cantidad: quantities[producto.id] }];
-      });
-      setQuantities(prev => ({
-        ...prev,
-        [producto.id]: 0,
-      }));
+  // Función para agregar todos los productos seleccionados
+  const agregarProductosSeleccionados = () => {
+    const hayProductosParaAgregar = Object.entries(quantities).some(([id, cantidad]) => cantidad > 0);
+    
+    if (!hayProductosParaAgregar) {
+      Alert.alert("Aviso", "No hay productos seleccionados para agregar");
+      return;
     }
+
+    Object.entries(quantities).forEach(([id, cantidad]) => {
+      if (cantidad > 0) {
+        const producto = productos.find(p => p.id.toString() === id.toString());
+        if (producto) {
+          setProductosSeleccionados(prev => {
+            const index = prev.findIndex(p => p.id === producto.id);
+            if (index !== -1) {
+              const nuevosProductos = [...prev];
+              nuevosProductos[index].cantidad += cantidad;
+              return nuevosProductos;
+            }
+            return [...prev, { ...producto, cantidad }];
+          });
+        }
+      }
+    });
+
+    // Limpiar cantidades después de agregar
+    setQuantities({});
+    Alert.alert("Éxito", "Productos agregados a la orden");
   };
 
   const modificarCantidad = (id, nuevaCantidad) => {
@@ -96,6 +109,11 @@ const MenuBebidas = ({ navigation, route }) => {
 
   const confirmarOrden = async () => {
     try {
+      if (productosSeleccionados.length === 0) {
+        Alert.alert("Aviso", "No hay productos seleccionados para confirmar");
+        return;
+      }
+
       const fechaDeOrden = new Date().toISOString().split('T')[0];
       for (const producto of productosSeleccionados) {
         const response = await fetch(`http://${IP}:8000/club/ordenes-de-compra/`, {
@@ -110,6 +128,7 @@ const MenuBebidas = ({ navigation, route }) => {
             producto: producto.id,
             usuario_responsable: usuarioResponsableId,
             precio_orden: producto.cantidad * producto.precio,
+            nota: nota, // Agregar la nota al pedido
           }),
         });
         if (!response.ok) {
@@ -168,6 +187,7 @@ const MenuBebidas = ({ navigation, route }) => {
 
       setProductosSeleccionados([]);
       setQuantities({});
+      setNota('');
       Alert.alert("Éxito", "Orden confirmada con éxito");
     } catch (error) {
       console.error("Error al confirmar la orden:", error);
@@ -178,11 +198,52 @@ const MenuBebidas = ({ navigation, route }) => {
   const cancelarOrden = () => {
     setProductosSeleccionados([]);
     setQuantities({});
+    setNota('');
     Alert.alert("Orden cancelada");
   };
 
-  const verTicket = () => {
-    navigation.navigate('Ticket', { mesaId: mesaId });
+  const verTicket = async () => {
+    try {
+      // Verificar si hay un ticket para la mesa
+      const response = await fetch(`http://${IP}:8000/club/cargos/?mesa=${mesaId}`);
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      const cargosData = await response.json();
+      console.log("Cargos encontrados:", cargosData); // Depuración
+
+      if (cargosData.length > 0) {
+        // Si hay un ticket, redirigir a la pantalla del ticket
+        navigation.navigate('Ticket', { mesaId });
+      } else {
+        // Si no hay un ticket, mostrar un Alert
+        Alert.alert(
+          'Aviso',
+          'No se encontró un ticket para esta mesa.',
+          [
+            {
+              text: 'Aceptar',
+              onPress: () => console.log('Usuario aceptó'),
+            },
+          ],
+          { cancelable: false }
+        );
+      }
+    } catch (error) {
+      console.error('Error al verificar el ticket:', error);
+      Alert.alert(
+        'Error',
+        'No se pudo verificar el ticket. Inténtalo de nuevo.',
+        [
+          {
+            text: 'Aceptar',
+            onPress: () => console.log('Usuario aceptó'),
+          },
+        ],
+        { cancelable: false }
+      );
+    }
   };
 
   return (
@@ -228,9 +289,6 @@ const MenuBebidas = ({ navigation, route }) => {
                 <TouchableOpacity style={styles.controlButton} onPress={() => increment(item.id)}>
                   <Text style={styles.controlButtonText}>+</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.addButton} onPress={() => agregarProducto(item)}>
-                  <Text style={styles.addButtonText}>Añadir</Text>
-                </TouchableOpacity>
               </View>
             </View>
           )}
@@ -239,6 +297,27 @@ const MenuBebidas = ({ navigation, route }) => {
           scrollEnabled={true}
           nestedScrollEnabled={true}
         />
+
+        {/* Botón único para agregar productos */}
+        <TouchableOpacity 
+          style={styles.buttonAgregarTodos} 
+          onPress={agregarProductosSeleccionados}
+        >
+          <Text style={styles.buttonAgregarTodosText}>Añadir a la orden</Text>
+        </TouchableOpacity>
+
+        {/* Campo para notas */}
+        <View style={styles.notaContainer}>
+          <Text style={styles.notaLabel}>Notas para la orden:</Text>
+          <TextInput
+            style={styles.notaInput}
+            value={nota}
+            onChangeText={setNota}
+            placeholder="Especificaciones del cliente (opcional)"
+            multiline={true}
+            numberOfLines={3}
+          />
+        </View>
 
         {/* Texto para los productos seleccionados */}
         <Text style={styles.selectedTitle}>Productos seleccionados</Text>
@@ -362,17 +441,40 @@ const styles = StyleSheet.create({
     minWidth: 20,
     textAlign: 'center',
   },
-  addButton: {
+  buttonAgregarTodos: {
     backgroundColor: '#FFA500',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    marginLeft: 5,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 15,
+    marginBottom: 10,
+    width: '90%',
+    alignItems: 'center',
   },
-  addButtonText: {
+  buttonAgregarTodosText: {
     color: '#FFF',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 16,
+  },
+  notaContainer: {
+    width: '100%',
+    marginTop: 10,
+    marginBottom: 15,
+  },
+  notaLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 5,
+  },
+  notaInput: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 10,
+    backgroundColor: '#FFF',
+    minHeight: 80,
+    textAlignVertical: 'top',
   },
   selectedTitle: {
     fontSize: 16,

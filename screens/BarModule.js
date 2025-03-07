@@ -62,12 +62,23 @@ const BartenderScreen = () => {
     fetchOrders();
   }, []);
 
-  // Agrupar las órdenes por mesa
+  // Agrupar las órdenes por mesa y consolidar notas
   const groupedOrders = orders.reduce((acc, order) => {
     if (!acc[order.mesas]) {
-      acc[order.mesas] = [];
+      acc[order.mesas] = {
+        orders: [],
+        notas: new Set(), // Usamos un Set para evitar duplicados
+      };
     }
-    acc[order.mesas].push(order);
+    
+    // Añadimos la orden al grupo
+    acc[order.mesas].orders.push(order);
+    
+    // Si hay una nota y no está vacía, la añadimos al conjunto de notas
+    if (order.nota && order.nota.trim()) {
+      acc[order.mesas].notas.add(order.nota);
+    }
+    
     return acc;
   }, {});
 
@@ -87,30 +98,48 @@ const BartenderScreen = () => {
         {Object.keys(groupedOrders).length === 0 ? (
           <Text style={styles.noOrdersText}>No hay órdenes pendientes</Text>
         ) : (
-          Object.keys(groupedOrders).map((mesa) => (
-            <View key={mesa} style={styles.orderCard}>
-              <View style={styles.header}>
-                <Text style={styles.headerText}>MESA {mesa}</Text>
-              </View>
-              <View style={styles.orderContainer}>
-                {groupedOrders[mesa].map((order) => (
-                  <View key={order.id} style={styles.orderItem}>
-                    <Text style={styles.orderText}>
-                      {order.nombre_producto} x {order.cantidad}
-                    </Text>
+          Object.keys(groupedOrders).map((mesa) => {
+            const mesaData = groupedOrders[mesa];
+            const notasArray = Array.from(mesaData.notas); // Convertimos el Set a Array
+            
+            return (
+              <View key={mesa} style={styles.orderCard}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>MESA {mesa}</Text>
+                </View>
+                <View style={styles.orderContainer}>
+                  {mesaData.orders.map((order) => (
+                    <View key={order.id} style={styles.orderItem}>
+                      <Text style={styles.orderText}>
+                        {order.nombre_producto} x {order.cantidad}
+                      </Text>
+                    </View>
+                  ))}
+                  
+                  {/* Sección de notas */}
+                  {notasArray.length > 0 && (
+                    <View style={styles.notaSection}>
+                      <Text style={styles.notaTitle}>Notas:</Text>
+                      {notasArray.map((nota, index) => (
+                        <View key={index} style={styles.notaContainer}>
+                          <Text style={styles.notaText}>{nota}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity 
+                      style={styles.completeButton}
+                      onPress={() => handleCompleteOrder(mesa)}
+                    >
+                      <Text style={styles.completeButtonText}>Completar</Text>
+                    </TouchableOpacity>
                   </View>
-                ))}
-                <View style={styles.buttonContainer}>
-                  <TouchableOpacity 
-                    style={styles.completeButton}
-                    onPress={() => handleCompleteOrder(mesa)}
-                  >
-                    <Text style={styles.completeButtonText}>Completar</Text>
-                  </TouchableOpacity>
                 </View>
               </View>
-            </View>
-          ))
+            );
+          })
         )}
       </ScrollView>
     </View>
@@ -162,6 +191,30 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
     marginBottom: 5,
+  },
+  notaSection: {
+    marginTop: 5,
+    marginBottom: 15,
+    borderTopWidth: 1,
+    borderTopColor: "#eaeaea",
+    paddingTop: 10,
+  },
+  notaTitle: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#2d2d86",
+    marginBottom: 5,
+  },
+  notaContainer: {
+    backgroundColor: "#f0f0f8",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 5,
+  },
+  notaText: {
+    fontSize: 14,
+    color: "#444",
+    fontStyle: "italic",
   },
   buttonContainer: {
     marginTop: 10,
