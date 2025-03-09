@@ -1,14 +1,219 @@
+/* dashboard.css - Actualizado con el estilo compartido */
+
+/* Variables globales */
+:root {
+  --color-primario: #3f51b5;
+  --color-secundario: #ff4081;
+  --color-texto: #333333;
+  --color-fondo: #f8f9fa;
+  --color-exito: #4CAF50;
+  --color-error: #FF5252;
+  --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --borde-radio: 12px;
+  --transicion: all 0.3s ease;
+}
+
+/* Estilos generales */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-fondo);
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  color: var(--color-texto);
+}
+
 .dashboard-container {
-    padding: 20px;
+  max-width: 1400px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+/* Títulos */
+.dashboard-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--color-primario);
+  margin-bottom: 25px;
+  position: relative;
+  padding-bottom: 10px;
+  text-transform: capitalize;
+}
+
+.dashboard-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background-color: var(--color-secundario);
+  border-radius: 2px;
+}
+
+.chart-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-primario);
+  margin-bottom: 15px;
+}
+
+/* Contenedores de gráficos */
+.chart-container {
+  background-color: white;
+  border-radius: var(--borde-radio);
+  padding: 20px;
+  box-shadow: var(--sombra-suave);
+  height: 100%;
+  transition: var(--transicion);
+  border-left: 3px solid var(--color-primario);
+  margin-bottom: 20px;
+}
+
+.chart-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Tarjetas de información */
+.dashboard-card {
+  background-color: white;
+  border-radius: var(--borde-radio);
+  padding: 20px;
+  box-shadow: var(--sombra-suave);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  transition: var(--transicion);
+  border-left: 3px solid var(--color-primario);
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card .card-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-texto);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-card .card-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-primario);
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-card .card-icon {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 2rem;
+  opacity: 0.2;
+  color: var(--color-primario);
+}
+
+/* Tooltips personalizados */
+.custom-tooltip {
+  background-color: white;
+  border-radius: var(--borde-radio);
+  padding: 10px;
+  box-shadow: var(--sombra-suave);
+  border-left: 3px solid var(--color-primario);
+}
+
+.tooltip-label {
+  color: var(--color-texto);
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.tooltip-value {
+  color: var(--color-primario);
+  font-weight: 600;
+}
+
+/* Estilo para el contenedor de las tarjetas y gráficos */
+.row + .row {
+  margin-top: 20px;
+}
+
+/* Adaptación de colores para los gráficos */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: #e0e0e0;
+}
+
+.recharts-text.recharts-label {
+  fill: var(--color-texto);
+}
+
+.recharts-default-tooltip {
+  background-color: white !important;
+  border-color: #e0e0e0 !important;
+  border-radius: var(--borde-radio) !important;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dashboard-container > * {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .dashboard-container {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-title {
+    font-size: 24px;
   }
   
-  .cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+  .dashboard-card .card-value {
+    font-size: 24px;
   }
   
-  .card {
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  .chart-container {
+    padding: 15px;
   }
+}
+
+@media (max-width: 480px) {
+  .dashboard-title {
+    font-size: 22px;
+  }
+  
+  .chart-title {
+    font-size: 18px;
+  }
+  
+  .dashboard-card {
+    padding: 12px;
+  }
+  
+  .dashboard-card .card-title {
+    font-size: 14px;
+  }
+  
+  .dashboard-card .card-value {
+    font-size: 22px;
+  }
+  
+  .chart-container {
+    padding: 12px;
+  }
+}

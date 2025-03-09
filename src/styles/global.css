@@ -1,23 +1,90 @@
-/* Estilos globales responsivos */
-body {
-  font-size: 16px;
+/* Variables globales */
+:root {
+  --primary-font: 'Arial', sans-serif;
+  --base-spacing: 1rem;
+  --transition-speed: 0.3s;
+  --content-padding: 1.5rem;
+  --text-color: #333;
+  --background-color: #f5f8fa;
+  --container-background: #fff;
+  --border-radius: 8px;
 }
 
+/* Reset y estilos base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 100%;
+  scroll-behavior: smooth;
+}
+
+/* Estilos globales responsivos */
+body {
+  margin: 0;
+  font-family: var(--primary-font);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Media queries para diferentes tamaños de pantalla */
 @media (max-width: 768px) {
   body {
     font-size: 14px;
   }
-}
-/* Estilos globales */
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
+  
+  :root {
+    --content-padding: 1rem;
+  }
 }
 
+@media (max-width: 576px) {
+  body {
+    font-size: 14px;
+  }
+  
+  :root {
+    --content-padding: 0.75rem;
+  }
+}
+
+/* Contenedores principales */
 .drawer-col {
   padding: 0;
+  transition: width var(--transition-speed) ease;
 }
 
-.dashboard-container, .users-container {
-  padding: 20px;
+.content-col {
+  transition: padding var(--transition-speed) ease;
+}
+
+.dashboard-container, 
+.users-container,
+.main-content-container {
+  padding: var(--content-padding);
+  background-color: var(--container-background);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: var(--base-spacing);
+}
+
+/* Utilidades de espaciado */
+.section-margin {
+  margin-bottom: calc(var(--base-spacing) * 2);
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
 }

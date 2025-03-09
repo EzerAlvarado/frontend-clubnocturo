@@ -1,35 +1,73 @@
 /* Estilos para el Drawer */
 .drawer {
-    background-color: #2c3e50; /* Color de fondo del Drawer */
-    color: white; /* Color del texto */
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
+  background-color: #2c3e50;
+  color: white;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+/* Estilos para pantallas grandes (md y superiores) */
+@media (min-width: 768px) {
+  .drawer {
+    height: 100vh;
+    width: 250px;
+    position: sticky;
+    top: 0;
   }
-  
-  /* Estilos para pantallas grandes (md y superiores) */
-  @media (min-width: 768px) {
-    .drawer {
-      height: 100vh; /* Altura completa de la pantalla */
-      width: 250px; /* Ancho del Drawer */
-    }
+}
+
+/* Estilos para pantallas pequeñas (sm y menores) */
+@media (max-width: 767.98px) {
+  .drawer {
+    width: 100%;
+    height: auto;
+    border-radius: 0 0 10px 10px;
   }
-  
-  /* Estilos para pantallas pequeñas (sm y menores) */
-  @media (max-width: 767.98px) {
-    .drawer {
-      width: 100%; /* Ocupa todo el ancho */
-      height: auto; /* Altura automática */
-    }
+}
+
+.drawer .logo-container {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.drawer .nav-link {
+  color: rgba(255, 255, 255, 0.85);
+  padding: 12px 15px;
+  margin: 8px 0;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.drawer .nav-link:hover {
+  background-color: #34495e;
+  color: white;
+  transform: translateX(3px);
+}
+
+.drawer .nav-link.active {
+  background-color: #3498db;
+  color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.drawer .nav-link i,
+.drawer .nav-link svg {
+  margin-right: 10px;
+  font-size: 1.1em;
+}
+
+/* Animación de entrada para el drawer en móvil */
+@keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 767.98px) {
+  .drawer.open {
+    animation: slideIn 0.3s forwards;
   }
-  
-  .drawer .nav-link {
-    color: white; /* Color de los enlaces */
-    padding: 10px 15px; /* Espaciado interno */
-    margin: 5px 0; /* Espaciado entre enlaces */
-    border-radius: 5px; /* Bordes redondeados */
-    transition: background-color 0.3s ease; /* Transición suave */
-  }
-  
-  .drawer .nav-link:hover {
-    background-color: #34495e; /* Color de fondo al pasar el mouse */
-  }
+}

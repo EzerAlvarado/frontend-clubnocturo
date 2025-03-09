@@ -1,102 +1,314 @@
-/* Estilos generales */
+/* Estilos generales con diseño moderno */
+:root {
+  --color-primario: #3f51b5;
+  --color-secundario: #ff4081;
+  --color-texto: #333333;
+  --color-fondo: #f8f9fa;
+  --color-exito: #4CAF50;
+  --color-error: #FF5252;
+  --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --borde-radio: 12px;
+  --transicion: all 0.3s ease;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-fondo);
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  color: var(--color-texto);
+}
+
 .agenda-container {
-    font-family: Arial, sans-serif;
-    background-color: #ffffff;
-    padding: 10px;
-    display: flex;
+  max-width: 1400px;
+  margin: 20px auto;
+  padding: 20px;
+  display: flex;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+
+/* Lista de eventos modernizada */
+.events-list {
+  flex: 3;
+  min-width: 320px;
+  padding: 25px;
+  background-color:#e1e1e1;
+  border-radius: var(--borde-radio);
+  box-shadow: var(--sombra-suave);
+  overflow-y: auto;
+  max-height: 85vh;
+  transition: var(--transicion);
+}
+
+.events-list h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--color-primario);
+  margin-bottom: 25px;
+  position: relative;
+  padding-bottom: 10px;
+  text-transform: capitalize;
+}
+
+.events-list h1::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background-color: var(--color-secundario);
+  border-radius: 2px;
+}
+
+.event-card {
+  background-color: white;
+  border-radius: var(--borde-radio);
+  padding: 20px;
+  margin-bottom: 10px;
+  box-shadow: var(--sombra-suave);
+  border-left: 3px solid var(--color-primario);
+  transition: var(--transicion);
+  position:relative;
+  overflow: hidden;
+}
+
+.event-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.card-fecha {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primario);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.card-fecha::before {
+  content: '📅';
+  font-size: 16px;
+}
+
+.card-titulo {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-texto);
+  margin: 8px 0;
+}
+
+.card-subtitulo {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-subtitulo[style*="color: #4CAF50"]::before {
+  content: '✅';
+  font-size: 14px;
+}
+
+.card-subtitulo[style*="color: #FF5252"]::before {
+  content: '⏳';
+  font-size: 14px;
+}
+
+/* Calendario modernizado */
+.calendar-container {
+  flex: 1.5;
+  min-width: 350px;
+  padding: 25px;
+  background-color: #e1e1e1;
+  border-radius: var(--borde-radio);
+  box-shadow: var(--sombra-suave);
+  display: flex;
+  flex-direction: column;
+  transition: var(--transicion);
+}
+
+/* Personalización de react-calendar */
+.custom-calendar {
+  width: 100% !important;
+  max-width: 100% !important;
+  background-color: white !important;
+  border: none !important;
+  border-radius: var(--borde-radio) !important;
+  padding: 15px !important;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif !important;
+  box-shadow: var(--sombra-suave) !important;
+}
+
+/* Estilos para la navegación del calendario */
+.react-calendar__navigation {
+  margin-bottom: 15px !important;
+}
+
+.react-calendar__navigation button {
+  min-width: 44px;
+  background: none !important;
+  font-size: 16px !important;
+  color: var(--color-texto) !important;
+  border-radius: 8px !important;
+  transition: var(--transicion) !important;
+}
+
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+  background-color: rgba(63, 81, 181, 0.1) !important;
+}
+
+.react-calendar__navigation__label {
+  font-weight: bold !important;
+  text-transform: capitalize !important;
+  color: var(--color-primario) !important;
+}
+
+/* Estilos para los días */
+.react-calendar__tile {
+  padding: 14px 10px !important;
+  font-size: 16px !important;
+  border-radius: 8px !important;
+  transition: var(--transicion) !important;
+}
+
+.react-calendar__month-view__days__day--weekend {
+  color: var(--color-secundario) !important;
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background-color: rgba(63, 81, 181, 0.1) !important;
+}
+
+.react-calendar__tile--now {
+  background-color: rgba(255, 64, 129, 0.1) !important;
+  color: var(--color-secundario) !important;
+}
+
+.react-calendar__tile--active {
+  background-color: var(--color-primario) !important;
+  color: white !important;
+}
+
+/* Estilo para fechas con eventos */
+.event-date {
+  position: relative;
+  background-color: rgba(63, 81, 181, 0.1) !important;
+  font-weight: bold !important;
+}
+
+.event-date::after {
+  content: "";
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-secundario);
+  border-radius: 50%;
+}
+
+/* Encabezados de días de la semana */
+.react-calendar__month-view__weekdays__weekday {
+  padding: 10px 0 !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+  font-size: 12px !important;
+  color: var(--color-primario) !important;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none !important;
+}
+
+
+
+/* Ajustes responsivos mejorados */
+@media (max-width: 992px) {
+  .agenda-container {
     gap: 20px;
-    flex-wrap: wrap; /* Permite que los elementos se ajusten en pantallas pequeñas */
+    padding: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .agenda-container {
+    flex-direction: column;
   }
   
-  /* Lista de eventos */
-  .events-list {
-    flex: 1;
-    min-width: 300px; /* Ancho mínimo para evitar que se haga demasiado pequeño */
+  .events-list, .calendar-container {
+    min-width: 280px;
+    max-width: 100%;
     padding: 20px;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow-y: auto; /* Permite desplazamiento si hay muchos eventos */
+  }
+  
+  .event-card {
+    padding: 15px;
   }
   
   .events-list h1 {
     font-size: 24px;
-    font-weight: 700;
-    color: #333333;
-    margin-bottom: 20px;
-  }
-  
-  .event-card {
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .card-content {
-    flex: 1;
-  }
-  
-  .card-fecha {
-    font-size: 18px;
-    font-weight: 700;
-    color: #555555;
   }
   
   .card-titulo {
-    font-size: 15px;
-    font-weight: 500;
-    color: #777777;
+    font-size: 18px;
+  }
+  
+  .react-calendar__tile {
+    padding: 10px 6px !important;
+    font-size: 14px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .events-list, .calendar-container {
+    padding: 15px;
+  }
+  
+  .events-list h1 {
+    font-size: 22px;
+  }
+  
+  .event-card {
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+  
+  .card-fecha {
+    font-size: 16px;
+  }
+  
+  .card-titulo {
+    font-size: 16px;
   }
   
   .card-subtitulo {
-    font-size: 15px;
-    font-weight: 500;
-    margin-top: 4px;
+    font-size: 14px;
   }
   
-  /* Calendario */
-  .calendar-container {
-    flex: 1;
-    min-width: 300px; /* Ancho mínimo para evitar que se haga demasiado pequeño */
-    padding: 20px;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: center; /* Centra horizontalmente */
-    align-items: center; /* Centra verticalmente */
+  .react-calendar__navigation button {
+    font-size: 14px !important;
+    padding: 5px !important;
   }
   
-  .custom-calendar {
-    background-color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Ocupa el 100% del contenedor */
-    max-width: 800px; /* Limita el tamaño máximo */
-    transform: scale(1); /* Escala inicial */
+  .react-calendar__tile {
+    padding: 8px 5px !important;
+    font-size: 13px !important;
   }
-  
-  /* Ajustes responsivos */
-  @media (max-width: 768px) {
-    .agenda-container {
-      flex-direction: column; /* Cambia a una columna en pantallas pequeñas */
-    }
-  
-    .events-list,
-    .calendar-container {
-      max-width: 100%; /* Ocupa el 100% del ancho en pantallas pequeñas */
-    }
-  
-    .custom-calendar {
-      transform: scale(0.9); /* Reduce ligeramente el tamaño del calendario en móviles */
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .custom-calendar {
-      transform: scale(0.8); /* Reduce aún más el tamaño del calendario en pantallas muy pequeñas */
-    }
-  }
+}

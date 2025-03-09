@@ -1,30 +1,147 @@
+/* Estilos para el componente Users */
 .users-container {
-    padding: 20px;
+  padding: var(--content-padding, 1.5rem);
+  background-color: var(--container-background, #fff);
+  border-radius: var(--border-radius, 8px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+.users-container h1 {
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+/* Estilos para el botón de agregar */
+.users-container > button {
+  margin-bottom: 1.5rem;
+  background-color:#259588;
+  border-color: #259588;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.users-container > button:hover {
+  background-color: #218579;
+  border-color: #218579;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para la tabla de usuarios */
+.users-container .table-responsive {
+  margin-top: 1.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.user-table {
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.user-table thead {
+  background-color: #34495e;
+  color: white;
+}
+
+.user-table th {
+  padding: 12px 15px;
+  border: none;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.user-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.user-table tbody tr:hover {
+  background-color: rgba(52, 152, 219, 0.05);
+}
+
+.user-table td {
+  padding: 12px 15px;
+  vertical-align: middle;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  border-left: none;
+  border-right: none;
+}
+
+/* Estilos para los botones de acción */
+.user-table td button {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.75rem;
+  margin-right: 0.5rem;
+  border-radius: 4px;
+}
+
+.user-table td button.btn-warning {
+  background-color: #2a3d61;
+  border-color: #2a3d61;
+  color: white;
+}
+
+.user-table td button.btn-warning:hover {
+  background-color: #293957;
+  border-color: #293957;
+}
+
+.user-table td button.btn-danger {
+  background-color: #ff1d65;
+  border-color: #ff1d65;
+}
+
+.user-table td button.btn-danger:hover {
+  background-color: #e91a5b;
+  border-color: #e91a5b;
+}
+
+/* Estilos para pantallas medianas */
+@media (max-width: 992px) {
+  .users-container h1 {
+    font-size: 1.6rem;
   }
   
-  .user-table {
+  .user-table th, .user-table td {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Estilos para pantallas pequeñas */
+@media (max-width: 768px) {
+  .users-container {
+    padding: 1rem;
+  }
+  
+  .users-container h1 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+  }
+  
+  .users-container > button {
+    margin-bottom: 1rem;
     width: 100%;
-    margin-top: 20px;
   }
   
-  .user-table th {
-    background-color: #3498db;
-    color: white;
+  .user-table td button {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.8rem;
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    margin-right: 0;
   }
   
-  .user-table td, .user-table th {
-    padding: 12px;
-    text-align: left;
+  .user-table td button:last-child {
+    margin-bottom: 0;
   }
-  
-  .user-table tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-  
-  .user-table tr:hover {
-    background-color: #ddd;
-  }
-  
-  .user-table button {
-    margin: 0 5px;
-  }
+}
