@@ -1,31 +1,42 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+// src/App.js
+import React, { useContext } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import Drawer from './components/Drawer';
 import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
 import Agenda from './pages/Agenda';
+import Login from './pages/login';
+import { AuthContext } from './AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/global.css';
 
 function App() {
+  const { user } = useContext(AuthContext);
+
   return (
     <Router>
       <Container fluid>
-        <Row>
-          {/* Drawer: Responsivo (arriba en móviles, izquierda en pantallas grandes) */}
-          <Col xs={12} md={2} className="drawer-col">
-            <Drawer />
-          </Col>
-          {/* Contenido principal */}
-          <Col xs={12} md={10}>
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/agenda" element={<Agenda/>}/>
-            </Routes>
-          </Col>
-        </Row>
+        {user ? (
+          <Row>
+            <Col xs={12} md={2} className="drawer-col">
+              <Drawer />
+            </Col>
+            <Col xs={12} md={10}>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/users" element={<Users />} />
+                <Route path="/agenda" element={<Agenda />} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </Col>
+          </Row>
+        ) : (
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="*" element={<Navigate to="/login" />} />
+          </Routes>
+        )}
       </Container>
     </Router>
   );
