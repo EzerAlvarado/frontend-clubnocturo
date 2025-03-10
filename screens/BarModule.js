@@ -4,8 +4,7 @@ import API_URL from "../url";
 
 const BartenderScreen = () => {
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true); // Estado para manejar la carga
-  // Variable de IP 
+  const [loading, setLoading] = useState(true);
   const IP = API_URL;
 
   // Función para obtener las órdenes desde la API
@@ -18,31 +17,67 @@ const BartenderScreen = () => {
       const data = await response.json();
       console.log("Datos recibidos de la API:", data);
 
-      // Filtra las órdenes no completadas (completado = false)
-      const pendingOrders = data.filter((order) => order.completado === false);
-      setOrders(pendingOrders);
+      // Transformar los datos agrupados por mesa a un array plano
+      const allOrders = [];
+      Object.keys(data).forEach(mesa => {
+        data[mesa].forEach(order => {
+          // Solo incluir órdenes donde listo_a_pagar es false
+          if (order.listo_a_pagar === false) {
+            allOrders.push(order);
+          }
+        });
+      });
+
+      // Ordenar las órdenes por fecha y hora (más antiguas primero)
+      const sortedOrders = allOrders.sort((a, b) => {
+        // Si hay fecha y hora completa
+        if (a.fecha_de_orden && b.fecha_de_orden) {
+          const dateA = new Date(a.fecha_de_orden);
+          const dateB = new Date(b.fecha_de_orden);
+          
+          // Si las fechas son iguales, ordenar por ID
+          if (dateA.getTime() === dateB.getTime()) {
+            return a.id - b.id;
+          }
+          
+          return dateA - dateB;
+        }
+        // Si no hay fecha, ordenar por ID
+        return a.id - b.id;
+      });
+      
+      setOrders(sortedOrders);
     } catch (error) {
       console.error("Error al obtener las órdenes:", error);
       alert("Error al obtener las órdenes. Verifica la conexión o intenta nuevamente.");
     } finally {
-      setLoading(false); // Finaliza la carga
+      setLoading(false);
     }
   };
 
-  // Función para marcar todas las órdenes de una mesa como completadas
+  // Función para actualizar las órdenes periódicamente
+  const startPolling = () => {
+    const interval = setInterval(() => {
+      fetchOrders();
+    }, 30000); // Actualiza cada 30 segundos
+    
+    return () => clearInterval(interval); // Limpia el intervalo cuando el componente se desmonta
+  };
+
+  // Función para marcar todas las órdenes de una mesa como listas para pagar
   const handleCompleteOrder = async (mesa) => {
     try {
       // Filtrar las órdenes de la mesa
-      const mesaOrders = orders.filter((order) => order.mesas === parseInt(mesa));
+      const mesaOrders = orders.filter((order) => order.mesa === parseInt(mesa));
 
-      // Marcar cada orden como completada
+      // Marcar cada orden como lista para pagar
       for (const order of mesaOrders) {
         const response = await fetch(`http://${IP}:8000/club/ordenes-de-compra/${order.id}/`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ completado: true }), // Actualiza completado a true
+          body: JSON.stringify({ listo_a_pagar: true }), // Cambiamos listo_a_pagar a true
         });
 
         if (!response.ok) {
@@ -51,38 +86,67 @@ const BartenderScreen = () => {
       }
 
       // Actualizar el estado local eliminando las órdenes completadas
-      setOrders((prevOrders) => prevOrders.filter((order) => order.mesas !== parseInt(mesa)));
+      setOrders((prevOrders) => prevOrders.filter((order) => order.mesa !== parseInt(mesa)));
     } catch (error) {
       console.error("Error al completar las órdenes:", error);
+      alert("Error al completar las órdenes. Inténtalo nuevamente.");
     }
   };
 
-  // Obtener las órdenes al cargar la pantalla
+  // Obtener las órdenes al cargar la pantalla y configurar el polling
   useEffect(() => {
     fetchOrders();
+    const cleanupPolling = startPolling();
+    
+    return () => {
+      cleanupPolling(); // Limpia el intervalo cuando el componente se desmonte
+    };
   }, []);
 
-  // Agrupar las órdenes por mesa y consolidar notas
-  const groupedOrders = orders.reduce((acc, order) => {
-    if (!acc[order.mesas]) {
-      acc[order.mesas] = {
-        orders: [],
-        notas: new Set(), // Usamos un Set para evitar duplicados
-      };
-    }
+  // Agrupar las órdenes por mesa pero conservando el orden cronológico de llegada
+  const groupOrdersByMesa = () => {
+    // Primero, agrupar las órdenes por mesa
+    const groupedByMesa = orders.reduce((acc, order) => {
+      const mesa = order.mesa;
+      if (!acc[mesa]) {
+        acc[mesa] = {
+          mesa,
+          orders: [],
+          notas: new Set(),
+          // Guardamos la primera orden para ordenar las mesas por tiempo de llegada
+          firstOrderTime: order.fecha_de_orden || order.id,
+          firstOrderId: order.id
+        };
+      }
+      
+      acc[mesa].orders.push(order);
+      
+      if (order.nota && order.nota.trim()) {
+        acc[mesa].notas.add(order.nota);
+      }
+      
+      return acc;
+    }, {});
     
-    // Añadimos la orden al grupo
-    acc[order.mesas].orders.push(order);
-    
-    // Si hay una nota y no está vacía, la añadimos al conjunto de notas
-    if (order.nota && order.nota.trim()) {
-      acc[order.mesas].notas.add(order.nota);
-    }
-    
-    return acc;
-  }, {});
+    // Convertir a array y ordenar las mesas por primera orden recibida
+    return Object.values(groupedByMesa).sort((a, b) => {
+      // Primero intentar ordenar por fecha
+      if (a.firstOrderTime && b.firstOrderTime) {
+        const dateA = new Date(a.firstOrderTime);
+        const dateB = new Date(b.firstOrderTime);
+        
+        // Si las fechas son iguales, ordenar por ID
+        if (dateA.getTime() === dateB.getTime()) {
+          return a.firstOrderId - b.firstOrderId;
+        }
+        
+        return dateA - dateB;
+      }
+      // Si no hay fecha, ordenar por ID de la primera orden
+      return a.firstOrderId - b.firstOrderId;
+    });
+  };
 
-  // Mostrar un indicador de carga mientras se obtienen los datos
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -92,15 +156,27 @@ const BartenderScreen = () => {
     );
   }
 
+  // Obtener las mesas ordenadas cronológicamente
+  const orderedMesas = groupOrdersByMesa();
+
   return (
     <View style={styles.container}>
+      <View style={styles.headerBar}>
+        <Text style={styles.mainTitle}>Órdenes Pendientes</Text>
+        <TouchableOpacity 
+          style={styles.refreshButton}
+          onPress={fetchOrders}
+        >
+          <Text style={styles.refreshButtonText}>Actualizar</Text>
+        </TouchableOpacity>
+      </View>
+      
       <ScrollView>
-        {Object.keys(groupedOrders).length === 0 ? (
+        {orderedMesas.length === 0 ? (
           <Text style={styles.noOrdersText}>No hay órdenes pendientes</Text>
         ) : (
-          Object.keys(groupedOrders).map((mesa) => {
-            const mesaData = groupedOrders[mesa];
-            const notasArray = Array.from(mesaData.notas); // Convertimos el Set a Array
+          orderedMesas.map(({ mesa, orders: mesaOrders, notas }) => {
+            const notasArray = Array.from(notas);
             
             return (
               <View key={mesa} style={styles.orderCard}>
@@ -108,7 +184,7 @@ const BartenderScreen = () => {
                   <Text style={styles.headerText}>MESA {mesa}</Text>
                 </View>
                 <View style={styles.orderContainer}>
-                  {mesaData.orders.map((order) => (
+                  {mesaOrders.map((order) => (
                     <View key={order.id} style={styles.orderItem}>
                       <Text style={styles.orderText}>
                         {order.nombre_producto} x {order.cantidad}
@@ -116,7 +192,6 @@ const BartenderScreen = () => {
                     </View>
                   ))}
                   
-                  {/* Sección de notas */}
                   {notasArray.length > 0 && (
                     <View style={styles.notaSection}>
                       <Text style={styles.notaTitle}>Notas:</Text>
@@ -151,6 +226,28 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f4f4f4",
     padding: 10,
+  },
+  headerBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+    paddingHorizontal: 5,
+  },
+  mainTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2d2d86',
+  },
+  refreshButton: {
+    backgroundColor: '#2d2d86',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  refreshButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   loadingContainer: {
     flex: 1,
@@ -224,7 +321,7 @@ const styles = StyleSheet.create({
   completeButton: {
     backgroundColor: "#003366",
     paddingVertical: 10,
-    borderRadius: 12, //  redondeado
+    borderRadius: 12,
     alignItems: "center",
   },
   completeButtonText: {

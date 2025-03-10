@@ -18,7 +18,8 @@ const MenuBebidas = ({ navigation, route }) => {
   // Variable de IP 
   const IP = API_URL;
 
-  const mesaId = mesa.id;
+  // Asegurarnos de que mesaId sea un valor numérico
+  const mesaId = mesa?.id ? parseInt(mesa.id, 10) : null;
   const usuarioResponsableId = user ? user.id : null;
 
   useEffect(() => {
@@ -109,82 +110,44 @@ const MenuBebidas = ({ navigation, route }) => {
 
   const confirmarOrden = async () => {
     try {
+      // Verificación de ID de mesa
+      if (!mesaId) {
+        Alert.alert("Error", "No se ha proporcionado un ID de mesa válido");
+        return;
+      }
+  
       if (productosSeleccionados.length === 0) {
         Alert.alert("Aviso", "No hay productos seleccionados para confirmar");
         return;
       }
-
-      const fechaDeOrden = new Date().toISOString().split('T')[0];
+  
+      // Iterar sobre los productos seleccionados y enviar una solicitud POST por cada uno
       for (const producto of productosSeleccionados) {
-        const response = await fetch(`http://${IP}:8000/club/ordenes-de-compra/`, {
+        const datosOrden = {
+          mesa_id: mesaId,
+          producto_id: producto.id,
+          cantidad: producto.cantidad,
+          usuario_responsable_id: usuarioResponsableId,
+          nota: nota,
+        };
+  
+        console.log("Datos enviados al servidor:", JSON.stringify(datosOrden, null, 2)); // Depuración
+  
+        const response = await fetch(`http://${IP}:8000/club/ordenes/crear/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            cantidad: producto.cantidad,
-            fecha_de_orden: fechaDeOrden,
-            mesas: mesaId,
-            producto: producto.id,
-            usuario_responsable: usuarioResponsableId,
-            precio_orden: producto.cantidad * producto.precio,
-            nota: nota, // Agregar la nota al pedido
-          }),
+          body: JSON.stringify(datosOrden),
         });
+  
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`Error al confirmar la orden para el producto ${producto.id}: ${errorText}`);
         }
       }
-
-      const totalOrdenActual = productosSeleccionados.reduce(
-        (total, producto) => total + producto.cantidad * producto.precio,
-        0
-      );
-      const totalCobro = parseFloat(totalOrdenActual.toFixed(2));
-
-      const getCargoResponse = await fetch(`http://${IP}:8000/club/cargos/?mesa=${mesaId}`);
-      const cargosData = await getCargoResponse.json();
-
-      if (cargosData.length === 0) {
-        const postCargoResponse = await fetch(`http://${IP}:8000/club/cargos/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            mesa: mesaId,
-            total_cobro: totalCobro,
-            estado: 'pendiente',
-            usuario_responsable: usuarioResponsableId,
-          }),
-        });
-        if (!postCargoResponse.ok) {
-          const errorText = await postCargoResponse.text();
-          throw new Error(`Error al crear el registro de Cargo: ${errorText}`);
-        }
-      } else {
-        const cargoExistente = cargosData[0];
-        const totalCobroExistente = parseFloat(cargoExistente.total_cobro);
-        const nuevoTotalCobro = parseFloat((totalCobroExistente + totalCobro).toFixed(2));
-        const putResponse = await fetch(`http://${IP}:8000/club/cargos/${cargoExistente.id}/`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            mesa: mesaId,
-            total_cobro: nuevoTotalCobro,
-            estado: 'pendiente',
-            usuario_responsable: usuarioResponsableId,
-          }),
-        });
-        if (!putResponse.ok) {
-          const errorText = await putResponse.text();
-          throw new Error(`Error al actualizar el ticket: ${errorText}`);
-        }
-      }
-
+  
+      // Limpiar el estado después de confirmar la orden
       setProductosSeleccionados([]);
       setQuantities({});
       setNota('');
@@ -202,48 +165,15 @@ const MenuBebidas = ({ navigation, route }) => {
     Alert.alert("Orden cancelada");
   };
 
-  const verTicket = async () => {
-    try {
-      // Verificar si hay un ticket para la mesa
-      const response = await fetch(`http://${IP}:8000/club/cargos/?mesa=${mesaId}`);
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-
-      const cargosData = await response.json();
-      console.log("Cargos encontrados:", cargosData); // Depuración
-
-      if (cargosData.length > 0) {
-        // Si hay un ticket, redirigir a la pantalla del ticket
-        navigation.navigate('Ticket', { mesaId });
-      } else {
-        // Si no hay un ticket, mostrar un Alert
-        Alert.alert(
-          'Aviso',
-          'No se encontró un ticket para esta mesa.',
-          [
-            {
-              text: 'Aceptar',
-              onPress: () => console.log('Usuario aceptó'),
-            },
-          ],
-          { cancelable: false }
-        );
-      }
-    } catch (error) {
-      console.error('Error al verificar el ticket:', error);
-      Alert.alert(
-        'Error',
-        'No se pudo verificar el ticket. Inténtalo de nuevo.',
-        [
-          {
-            text: 'Aceptar',
-            onPress: () => console.log('Usuario aceptó'),
-          },
-        ],
-        { cancelable: false }
-      );
+  const verTicket = () => {
+    // Verificar si hay un ID de mesa válido
+    if (!mesaId) {
+      Alert.alert("Error", "No se ha proporcionado un ID de mesa válido");
+      return;
     }
+  
+    // Navegar directamente a la pantalla del ticket con el ID de la mesa
+    navigation.navigate('Ticket', { mesaId });
   };
 
   return (
@@ -256,6 +186,11 @@ const MenuBebidas = ({ navigation, route }) => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Text style={styles.backButtonText}>Regresar</Text>
           </TouchableOpacity>
+        </View>
+
+        {/* Información de la mesa para depuración */}
+        <View style={styles.mesaInfoContainer}>
+          <Text style={styles.mesaInfoText}>Mesa ID: {mesaId}</Text>
         </View>
 
         {/* Picker sin etiqueta */}
@@ -396,6 +331,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#000',
+  },
+  mesaInfoContainer: {
+    width: '100%',
+    backgroundColor: '#f0f0f0',
+    padding: 5,
+    marginBottom: 10,
+    borderRadius: 4,
+  },
+  mesaInfoText: {
+    fontSize: 12,
+    color: '#666',
   },
   picker: {
     marginVertical: 10,
