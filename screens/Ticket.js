@@ -3,14 +3,17 @@ import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Alert, ActivityIn
 
 // URLs de los endpoints
 const API_URLS = {
-  CARGOS: "http://127.0.0.1:8000/club/cargos/ticket_provisional/",
+  TICKET_PROVISIONAL: "http://127.0.0.1:8000/club/cargos/ticket_provisional/", // Endpoint para obtener el ticket provisional
+  CARGOS: "http://127.0.0.1:8000/club/cargos/", // Endpoint para obtener todos los cargos
+  PAGAR: "http://127.0.0.1:8000/club/cargos/" // Base URL para pagar un cargo
 };
 
 const TicketScreen = ({ route, navigation }) => {
-  const [ticket, setTicket] = useState(null);
-  const [cargo, setCargo] = useState(null);
+  const [ticket, setTicket] = useState(null); // Datos del ticket provisional
+  const [cargo, setCargo] = useState(null); // Datos del cargo pendiente
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [processingPayment, setProcessingPayment] = useState(false);
 
   // Extraer mesaId de los parámetros de la ruta
   const mesaId = route.params?.mesaId;
@@ -25,98 +28,155 @@ const TicketScreen = ({ route, navigation }) => {
     );
   }, [navigation]);
 
-  // Función para obtener cargos
-  const obtenerCargos = useCallback(async () => {
+  // Función para obtener el ticket provisional de la mesa
+  const obtenerTicketProvisional = useCallback(async () => {
     if (!mesaId) {
       throw new Error("No se proporcionó un ID de mesa válido.");
     }
 
-    const response = await fetch(`${API_URLS.CARGOS}?mesa_id=${mesaId}`);
+    try {
+      // Hacer la solicitud GET al endpoint del ticket provisional
+      const response = await fetch(`${API_URLS.TICKET_PROVISIONAL}?mesa_id=${mesaId}`);
+      
+      // Verificar si la respuesta es válida
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Respuesta del servidor (error):", errorText);
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      // Intentar parsear la respuesta como JSON
+      const ticketData = await response.json();
+      console.log("Ticket provisional obtenido:", ticketData);
+
+      // Verificar si hay un ticket provisional para la mesa
+      if (ticketData.length === 0) {
+        throw new Error("No hay un ticket provisional para esta mesa.");
+      }
+
+      return ticketData[0]; // Devolver el primer ticket provisional (si existe)
+    } catch (error) {
+      console.error('Error al obtener el ticket provisional:', error);
+      throw new Error("No se pudo obtener el ticket provisional. Verifica la conexión o la URL.");
+    }
+  }, [mesaId]);
+
+  // Función para obtener el cargo pendiente de la mesa
+  const obtenerCargoPendiente = useCallback(async () => {
+    if (!mesaId) {
+      throw new Error("No se proporcionó un ID de mesa válido.");
+    }
+
+    // Hacer la solicitud GET al endpoint de cargos
+    const response = await fetch(API_URLS.CARGOS);
     if (!response.ok) {
       throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
 
     const cargosData = await response.json();
-    return cargosData;
+    console.log("Cargos obtenidos:", cargosData);
+
+    // Filtrar cargos para encontrar el que coincide con la mesa y está pendiente
+    const cargoPendiente = cargosData.find(cargo => 
+      cargo.mesa === parseInt(mesaId, 10) && cargo.estado === "pendiente"
+    );
+
+    if (!cargoPendiente) {
+      throw new Error(`No se encontró un cargo pendiente para la mesa ${mesaId}.`);
+    }
+
+    return cargoPendiente;
   }, [mesaId]);
 
-  // Función para obtener el ticket
-  const fetchTicket = useCallback(async () => {
+  // Función para obtener el ticket provisional y el cargo pendiente
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      if (!mesaId) {
-        throw new Error("No se proporcionó un ID de mesa válido.");
-      }
+      // Obtener el ticket provisional
+      const ticketProvisional = await obtenerTicketProvisional();
+      console.log("Ticket provisional encontrado:", ticketProvisional);
 
-      // Obtener cargos
-      const cargosData = await obtenerCargos();
-      console.log("Cargos obtenidos:", cargosData);
+      // Obtener el cargo pendiente
+      const cargoPendiente = await obtenerCargoPendiente();
+      console.log("Cargo pendiente encontrado:", cargoPendiente);
 
-      // Verificar si hay un cargo para la mesa
-      if (cargosData.length > 0) {
-        const cargoMesa = cargosData.find(cargo => cargo.mesa === mesaId);
-        
-        if (cargoMesa) {
-          setTicket(cargoMesa);
-          setCargo(cargoMesa);
-        } else {
-          // Modificación 1: Si no existe cargo, mantener la pantalla pero sin datos
-          setCargo({ mesa: mesaId }); // Solo guardar el ID de la mesa
-          setTicket(null);
-        }
-      } else {
-        // Modificación 1: Si no hay cargos, mantener la pantalla pero sin datos
-        setCargo({ mesa: mesaId }); // Solo guardar el ID de la mesa
-        setTicket(null);
-      }
+      // Actualizar los estados con los datos obtenidos
+      setTicket(ticketProvisional);
+      setCargo(cargoPendiente);
     } catch (error) {
-      console.error('Error al obtener el ticket:', error);
+      console.error('Error al obtener los datos:', error);
       setError(error.message);
-      mostrarAlerta('Error', 'No se pudo cargar el ticket. Inténtalo de nuevo.');
+      mostrarAlerta('Error', error.message);
     } finally {
       setLoading(false);
     }
-  }, [mesaId, obtenerCargos, mostrarAlerta]);
+  }, [obtenerTicketProvisional, obtenerCargoPendiente, mostrarAlerta]);
 
-  const handleCobrar = async () => {
-  try {
-    if (!ticket) {
-      throw new Error("No hay un ticket para cobrar.");
+  // Función para realizar el cobro
+  const handleCobrar = useCallback(async () => {
+    // Validar que exista un cargo con ID antes de proceder
+    if (!cargo || !cargo.id) {
+      Alert.alert('Error', 'No hay un cargo válido para cobrar.');
+      return;
     }
 
-    // Usar la nueva URL para pagar el cargo
-    const pagarResponse = await fetch(`http://127.0.0.1:8000/club/cargos/${mesaId}/pagar/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      // No es necesario enviar el estado en el cuerpo ya que la acción de pagar está implícita en el endpoint
-    });
-
-    if (!pagarResponse.ok) {
-      throw new Error('Error al pagar el cargo');
+    // Evitar múltiples clicks
+    if (processingPayment) {
+      return;
     }
 
-    mostrarAlerta('Éxito', 'Ticket cobrado correctamente.', () => navigation.goBack());
-  } catch (error) {
-    console.error('Error al cobrar el ticket:', error);
-    Alert.alert('Error', 'No se pudo cobrar el ticket. Inténtalo de nuevo.');
-  }
-  };
+    try {
+      setProcessingPayment(true);
+      const cargoId = cargo.id;
+      console.log(`Intentando pagar el cargo con ID: ${cargoId}`);
+      
+      // Usar la URL con el ID del cargo
+      const pagarUrl = `${API_URLS.PAGAR}${cargoId}/pagar/`;
+      console.log("URL de pago:", pagarUrl);
+      
+      const pagarResponse = await fetch(pagarUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!pagarResponse.ok) {
+        const errorText = await pagarResponse.text();
+        console.error(`Error en la respuesta: ${pagarResponse.status} ${pagarResponse.statusText}`);
+        console.error(`Detalle del error: ${errorText}`);
+        throw new Error(`Error al pagar el cargo: ${pagarResponse.status}`);
+      }
+
+      try {
+        const responseData = await pagarResponse.json();
+        console.log("Respuesta de pago:", responseData);
+      } catch (e) {
+        console.log("La respuesta no contiene JSON válido");
+      }
+
+      mostrarAlerta('Éxito', 'Cobro realizado correctamente.', () => navigation.goBack());
+    } catch (error) {
+      console.error('Error al cobrar el cargo:', error);
+      Alert.alert('Error', `No se pudo realizar el cobro: ${error.message}. Inténtalo de nuevo.`);
+    } finally {
+      setProcessingPayment(false);
+    }
+  }, [cargo, processingPayment, mostrarAlerta, navigation]);
 
   useEffect(() => {
     if (mesaId) {
-      fetchTicket();
+      fetchData();
     }
-  }, [mesaId, fetchTicket]);
+  }, [mesaId, fetchData]);
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#003366" />
-        <Text style={styles.loadingText}>Cargando ticket...</Text>
+        <Text style={styles.loadingText}>Cargando datos...</Text>
       </View>
     );
   }
@@ -132,9 +192,9 @@ const TicketScreen = ({ route, navigation }) => {
     );
   }
 
-  // Modificación 1: Renderizar la pantalla incluso si no hay ticket,
+  // Renderizar la pantalla incluso si no hay ticket o cargo,
   // siempre que tengamos un ID de mesa
-  if (!cargo) {
+  if (!ticket || !cargo) {
     return null;
   }
 
@@ -144,15 +204,16 @@ const TicketScreen = ({ route, navigation }) => {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Text style={styles.backButtonText}>Regresar</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ticket - Mesa {cargo.mesa}</Text>
+        <Text style={styles.headerTitle}>Ticket - Mesa {ticket.mesa}</Text>
       </View>
 
       <ScrollView style={styles.content}>
-        <Text style={styles.mesaText}>Mesa ID: {cargo.mesa}</Text>
+        <Text style={styles.mesaText}>Mesa ID: {ticket.mesa}</Text>
         <View style={styles.divider} />
 
+        {/* Sección de productos */}
         <Text style={styles.sectionTitle}>Productos:</Text>
-        {ticket && ticket.productos && ticket.productos.length > 0 ? (
+        {ticket.productos && ticket.productos.length > 0 ? (
           ticket.productos.map((producto, index) => (
             <View key={index} style={styles.productoItem}>
               <Text style={styles.productoText}>
@@ -165,22 +226,24 @@ const TicketScreen = ({ route, navigation }) => {
         )}
         <View style={styles.divider} />
 
-        <Text style={styles.totalText}>Total: ${ticket ? ticket.total_cobro : '0.00'}</Text>
+        <Text style={styles.totalText}>Total: ${ticket.total_cobro || '0.00'}</Text>
         <View style={styles.divider} />
       </ScrollView>
 
-        {cargo && (
-    <View style={styles.footer}>
-      <Text style={styles.footerText}>Seleccione la opción de cobrar una vez terminada la orden</Text>
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={handleCobrar}
-        disabled={!ticket || !ticket.productos || ticket.productos.length === 0}
-      >
-        <Text style={styles.buttonText}>Cobrar</Text>
-      </TouchableOpacity>
-    </View>
-    )}
+      {cargo && (
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Seleccione la opción de cobrar una vez terminada la orden</Text>
+          <TouchableOpacity 
+            style={[styles.button, processingPayment && styles.disabledButton]} 
+            onPress={handleCobrar}
+            disabled={processingPayment}
+          >
+            <Text style={styles.buttonText}>
+              {processingPayment ? 'Procesando...' : 'Cobrar'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -273,6 +336,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10, 
     paddingHorizontal: 20, 
     borderRadius: 5 
+  },
+  disabledButton: {
+    backgroundColor: '#A5D6A7',  // Lighter green for disabled state
   },
   buttonText: { 
     color: '#FFF', 
