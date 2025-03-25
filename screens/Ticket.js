@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-
+import API_URL from '../url';
+const IP = API_URL;
 // URLs de los endpoints
 const API_URLS = {
   TICKET_PROVISIONAL: "http://127.0.0.1:8000/club/cargos/ticket_provisional/", // Endpoint para obtener el ticket provisional
