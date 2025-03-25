@@ -1,6 +1,5 @@
-// App.jsx
 import 'react-native-gesture-handler';
-import React, { useContext } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -16,14 +15,14 @@ import AgregarEvento from './screens/AgregarEvento';
 import EditarEvento from './screens/EditarEvento';
 import MenuBebidas from './screens/MenuBebidas';
 
-import { AuthProvider, AuthContext } from './AuthContext';
+import { AuthProvider, useAuth } from './AuthContext';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
 // Componente personalizado para el contenido del Drawer
 function CustomDrawerContent(props) {
-  const { setUser } = useContext(AuthContext);
+  const { logout } = useAuth(); // Cambiado a useAuth()
 
   return (
     <View style={styles.drawerContainer}>
@@ -37,10 +36,7 @@ function CustomDrawerContent(props) {
         <DrawerItem
           label="Cerrar sesión"
           labelStyle={styles.logoutText}
-          onPress={() => {
-            // Al cerrar sesión, se elimina el usuario del contexto
-            setUser(null);
-          }}
+          onPress={logout} // Usamos la función logout del contexto
         />
       </View>
     </View>
@@ -49,7 +45,7 @@ function CustomDrawerContent(props) {
 
 // Drawer Navigator que muestra las pantallas según el rol del usuario
 function DrawerNavigator() {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth(); // Cambiado a useAuth()
 
   return (
     <Drawer.Navigator
@@ -68,20 +64,15 @@ function DrawerNavigator() {
         headerTintColor: 'white',
       }}
     >
-      {/* Todas los usuarios pueden ver elñ Home */}
       <Drawer.Screen name="Home" component={Home} />
 
-
-      {/* Mostrar Agenda de Eventos solo si el usuario es de Caja */}
-      {user && user.estado_solicitud === "C" && (
+      {user?.estado_solicitud === "C" && (
         <Drawer.Screen name="Agenda Eventos" component={AgendaEventos} />
       )}
-      {/* Mostrar BarModule (Barman) solo si el usuario es Bartender */}
-      {user && user.estado_solicitud === "B" && (
+      {user?.estado_solicitud === "B" && (
         <Drawer.Screen name="Barman" component={BarModule} />
       )}
-      {/* Mostrar Bloques solo si el usuario es Mesero*/}
-      {user && user.estado_solicitud === "M" && (
+      {user?.estado_solicitud === "M" && (
         <Drawer.Screen name="Bloques" component={Bloques} />
       )}
     </Drawer.Navigator>
@@ -90,12 +81,11 @@ function DrawerNavigator() {
 
 // Stack Navigator principal
 function RootNavigator() {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth(); // Cambiado a useAuth()
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {user ? (
-        // Si el usuario está logueado, mostrar la app principal
         <>
           <Stack.Screen name="Drawer" component={DrawerNavigator} />
           <Stack.Screen name="Ticket" component={TicketScreen} />
@@ -105,7 +95,6 @@ function RootNavigator() {
           <Stack.Screen name="Agregar" component={AgregarEvento} />
         </>
       ) : (
-        // Si no está logueado, solo mostrar el login
         <Stack.Screen name="Login" component={Login} />
       )}
     </Stack.Navigator>

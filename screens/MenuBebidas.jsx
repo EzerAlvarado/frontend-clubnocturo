@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, ScrollView, Alert, TextInput } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { AuthContext } from '../AuthContext';
+import { useAuth } from '../AuthContext';
 import API_URL from '../url';
 
 const MenuBebidas = ({ navigation, route }) => {
   const { mesa } = route.params;
-  const { user } = useContext(AuthContext);
+  const { user } =  useAuth();
 
   const [productos, setProductos] = useState([]);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');

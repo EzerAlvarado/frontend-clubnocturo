@@ -1,15 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { AuthContext } from '../AuthContext'; // Ajusta la ruta según la ubicación del archivo
+import React, { useState, useEffect } from 'react';
+import { View, Text, SafeAreaView, StyleSheet } from 'react-native';
+import { useAuth } from '../AuthContext';
 
 const Home = () => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
 
-
-
   useEffect(() => {
-    // Actualiza la fecha cada segundo
     const intervalId = setInterval(() => {
       setCurrentDate(new Date());
     }, 1000);
@@ -30,41 +27,91 @@ const Home = () => {
   const minutes = currentDate.getMinutes();
   const ampm = hours >= 12 ? 'PM' : 'AM';
   hours = hours % 12;
-  hours = hours ? hours : 12; // Si es 0, se muestra como 12
+  hours = hours ? hours : 12;
   const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.titulo}>Bienvenido</Text>
-      {/* Se muestra el nombre del usuario si existe, de lo contrario se muestra "Usuario" */}
-      <Text style={styles.subtitulo}>{user ? user.nombre : 'Usuario'}</Text>
-      <Text style={styles.titulo}>Hoy</Text>
-      <Text style={styles.subtitulo}>{formattedDate}</Text>
-      <Text style={styles.subtitulo}>{formattedTime}</Text>
-    </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.contentContainer}>
+        <View style={styles.greetingContainer}>
+          <Text style={styles.greetingText}>Hola,</Text>
+          <Text style={styles.usernameText}>
+            {user ? user.nombre : 'Usuario'}
+          </Text>
+        </View>
+        
+        <View style={styles.dateTimeContainer}>
+          <View style={styles.dateContainer}>
+            <Text style={styles.labelText}>Fecha de Hoy</Text>
+            <Text style={styles.dateText}>{formattedDate}</Text>
+          </View>
+          
+          <View style={styles.timeContainer}>
+            <Text style={styles.labelText}>Hora Actual</Text>
+            <Text style={styles.timeText}>{formattedTime}</Text>
+          </View>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
-export default Home;
-
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 24,
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
-    alignItems: "center",
-    justifyContent: "center",
+    flex: 1,
+    backgroundColor: '#F7F9FC',
   },
-  titulo: {
-    fontSize: 31,
-    fontWeight: "700",
-    color: "#1D2A32",
-    marginBottom: 6,
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 24,
+    justifyContent: 'center',
   },
-  subtitulo: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#929292",
+  greetingContainer: {
+    marginBottom: 32,
+  },
+  greetingText: {
+    fontSize: 24,
+    color: '#6E7191',
+    fontWeight: '400',
+  },
+  usernameText: {
+    fontSize: 36,
+    fontWeight: '700',
+    color: '#1D2A32',
+  },
+  dateTimeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  dateContainer: {
+    alignItems: 'center',
+  },
+  timeContainer: {
+    alignItems: 'center',
+  },
+  labelText: {
+    fontSize: 14,
+    color: '#6E7191',
+    marginBottom: 8,
+  },
+  dateText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1D2A32',
+  },
+  timeText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1D2A32',
   },
 });
+
+export default Home;
