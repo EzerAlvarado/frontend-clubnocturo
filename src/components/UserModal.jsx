@@ -72,7 +72,8 @@ function UserModal({ show, handleClose, user, handleSubmit }) {
     
     switch (name) {
       case 'nombre':
-        if (!value.trim()) {
+        // Check if value is a string before using trim()
+        if (!value || (typeof value === 'string' && !value.trim())) {
           newErrors.nombre = 'El nombre es requerido';
         } else {
           delete newErrors.nombre;
@@ -86,18 +87,20 @@ function UserModal({ show, handleClose, user, handleSubmit }) {
         }
         break;
       case 'numero_de_celular':
-        if (!value.trim()) {
+        // Check if value is a string before using trim()
+        if (!value || (typeof value === 'string' && !value.trim())) {
           newErrors.numero_de_celular = 'El número es requerido';
-        } else if (!/^\d{10}$/.test(value)) {
+        } else if (typeof value === 'string' && !/^\d{10}$/.test(value)) {
           newErrors.numero_de_celular = 'Ingrese un número válido de 10 dígitos';
         } else {
           delete newErrors.numero_de_celular;
         }
         break;
       case 'correo_cliente':
-        if (!value.trim()) {
+        // Check if value is a string before using trim()
+        if (!value || (typeof value === 'string' && !value.trim())) {
           newErrors.correo_cliente = 'El correo es requerido';
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        } else if (typeof value === 'string' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
           newErrors.correo_cliente = 'Ingrese un correo válido';
         } else {
           delete newErrors.correo_cliente;
@@ -106,7 +109,7 @@ function UserModal({ show, handleClose, user, handleSubmit }) {
       case 'contrasena':
         if (!value) {
           newErrors.contrasena = 'La contraseña es requerida';
-        } else if (value.length < 6) {
+        } else if (typeof value === 'string' && value.length < 6) {
           newErrors.contrasena = 'La contraseña debe tener al menos 6 caracteres';
         } else {
           delete newErrors.contrasena;
@@ -280,6 +283,22 @@ function UserModal({ show, handleClose, user, handleSubmit }) {
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.contrasena}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Confirmar Contraseña</Form.Label>
+                  <Form.Control
+                    type="password"
+                    name="confirmar_contrasena"
+                    value={formData.confirmar_contrasena}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    isInvalid={showError('confirmar_contrasena')}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.confirmar_contrasena}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Col>

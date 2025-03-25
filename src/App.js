@@ -16,7 +16,7 @@ function App() {
 
   return (
     <Router>
-      <Container fluid>
+      <Container fluid className="p-0 m-0">
         {user ? (
           <Row>
             <Col xs={12} md={2} className="drawer-col">
@@ -32,10 +32,12 @@ function App() {
             </Col>
           </Row>
         ) : (
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="*" element={<Navigate to="/login" />} />
-          </Routes>
+          <div className="login-full-screen">
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="*" element={<Navigate to="/login" />} />
+            </Routes>
+          </div>
         )}
       </Container>
     </Router>

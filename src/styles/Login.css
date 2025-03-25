@@ -1,97 +1,109 @@
 /* Estilos generales */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* Prevenir cualquier scrollbar */
+}
+
 .login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #18243a;
-    padding: 20px;
-  }
-  
-  /* Tarjeta de login */
-  .login-card {
-    background-color: #2a3d61;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    padding: 40px;
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-  }
-  
-  /* Encabezado */
-  .login-header {
-    margin-bottom: 30px;
-  }
-  
-  .login-image {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    margin-bottom: 20px;
-  }
-  
-  .login-title {
-    font-size: 24px;
-    font-weight: 600;
-    color: #ffffff;
-    margin-bottom: 10px;
-  }
-  
-  .login-subtitle {
-    font-size: 14px;
-    color: #C9D3DB;
-  }
-  
-  /* Formulario */
-  .login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  
-  .form-group {
-    text-align: left;
-  }
-  
-  .form-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #ffffff;
-    margin-bottom: 8px;
-    display: block;
-  }
-  
-  .form-input {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #C9D3DB;
-    background-color: #ffffff;
-    font-size: 14px;
-    color: #222;
-    transition: border-color 0.3s ease;
-  }
-  
-  .form-input:focus {
-    border-color: #259588;
-    outline: none;
-  }
-  
-  /* Botón de inicio de sesión */
-  .login-button {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: none;
-    background-color: #259588;
-    color: #ffffff;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .login-button:hover {
-    background-color: #1e7a6e;
-  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: #18243a;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Tarjeta de login */
+.login-card {
+  background-color: #2a3d61;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-sizing: border-box; /* Incluir padding en el ancho total */
+}
+
+/* Resto del CSS permanece igual */
+.login-header {
+  margin-bottom: 30px;
+}
+
+.login-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+}
+
+.login-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: #C9D3DB;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  text-align: left;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #C9D3DB;
+  background-color: #ffffff;
+  font-size: 14px;
+  color: #222;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  border-color: #259588;
+  outline: none;
+}
+
+.login-button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background-color: #259588;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.login-button:hover {
+  background-color: #1e7a6e;
+}
