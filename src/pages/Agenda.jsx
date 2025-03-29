@@ -9,7 +9,7 @@ const AgendaEventos = () => {
   // Función para cargar los eventos del backend
   const loadEvents = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/club/eventos/');
+      const response = await fetch('http://tk4gscwgcoc0s08c00gskg8o.31.170.165.191.sslip.io/club/eventos/');
       if (!response.ok) {
         alert("Error: No se pudieron cargar los eventos.");
         return;

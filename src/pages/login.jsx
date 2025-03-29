@@ -11,7 +11,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch(`http://${IP}:8000/club/usuarios/`);
+      const response = await fetch('http://tk4gscwgcoc0s08c00gskg8o.31.170.165.191.sslip.io/club/usuarios/');
       const usuarios = await response.json();
 
       const usuarioEncontrado = usuarios.find(

@@ -4,15 +4,16 @@ html, body {
   padding: 0;
   height: 100%;
   width: 100%;
-  overflow: hidden; /* Prevenir cualquier scrollbar */
+  overflow-x: hidden; /* Prevenir scroll horizontal */
+  /* Permitir scroll vertical cuando sea necesario */
 }
 
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh; /* Usar min-height en lugar de height */
+  width: 100%;
   background-color: #18243a;
   margin: 0;
   padding: 0;

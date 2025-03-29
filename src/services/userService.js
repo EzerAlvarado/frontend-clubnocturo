@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://127.0.0.1:8000/club/usuarios'; // Elimina la barra final
+const API_URL = 'http://tk4gscwgcoc0s08c00gskg8o.31.170.165.191.sslip.io/club/usuarios'; // Elimina la barra final
 
 export const getUsers = async () => {
   try {

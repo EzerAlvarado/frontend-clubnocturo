@@ -72,8 +72,8 @@ function Dashboard() {
     try {
       setLoading(true);
       
-      const ticketsResponse = await axios.get('http://127.0.0.1:8000/club/tickets/');
-      const ordenesResponse = await axios.get('http://127.0.0.1:8000/club/ordenes-de-compra/');
+      const ticketsResponse = await axios.get('http://tk4gscwgcoc0s08c00gskg8o.31.170.165.191.sslip.io/club/tickets/');
+      const ordenesResponse = await axios.get('http://tk4gscwgcoc0s08c00gskg8o.31.170.165.191.sslip.io/club/ordenes-de-compra/');
       
       setTickets(ticketsResponse.data);
       setOrdenes(ordenesResponse.data);
