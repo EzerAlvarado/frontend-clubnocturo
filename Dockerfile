@@ -1,16 +1,22 @@
-FROM python:3.12
-WORKDIR /usr/local/app
+# Usamos Node como base
+FROM node:18
 
-# Install the application dependencies
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# Establecer el directorio de trabajo
+WORKDIR /app
 
-# Copy in the source code
-COPY src ./src
-EXPOSE 5000
+# Copiar los archivos del proyecto
+COPY package.json package-lock.json ./
+COPY . .
 
-# Setup an app user so the container doesn't run as the root user
-RUN useradd app
-USER app
+# Instalar dependencias
+RUN npm install
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Exponer el puerto en el que correrá React
+EXPOSE 3008
+
+# Comando para ejecutar la aplicación
+CMD ["npm", "start"]
+
+
+
+
