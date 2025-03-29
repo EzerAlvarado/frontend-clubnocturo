@@ -4,9 +4,9 @@ import API_URL from '../url';
 const IP = API_URL;
 // URLs de los endpoints
 const API_URLS = {
-  TICKET_PROVISIONAL: "http://127.0.0.1:8000/club/cargos/ticket_provisional/", // Endpoint para obtener el ticket provisional
-  CARGOS: "http://127.0.0.1:8000/club/cargos/", // Endpoint para obtener todos los cargos
-  PAGAR: "http://127.0.0.1:8000/club/cargos/" // Base URL para pagar un cargo
+  TICKET_PROVISIONAL: "http://tk4gscwgcoc0s08c00gskg8o.31.170.165.191.sslip.io/club/cargos/ticket_provisional/", // Endpoint para obtener el ticket provisional
+  CARGOS: "http://tk4gscwgcoc0s08c00gskg8o.31.170.165.191.sslip.io/club/cargos/", // Endpoint para obtener todos los cargos
+  PAGAR: "http://tk4gscwgcoc0s08c00gskg8o.31.170.165.191.sslip.io/club/cargos/" // Base URL para pagar un cargo
 };
 
 const TicketScreen = ({ route, navigation }) => {

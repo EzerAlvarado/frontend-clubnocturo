@@ -37,8 +37,8 @@ const Bloques = ({ navigation }) => {
     const fetchData = async () => {
       try {
         const [mesasResponse, bloquesResponse] = await Promise.all([
-          fetch(`http://${IP}:8000/club/mesas/`),
-          fetch(`http://${IP}:8000/club/bloques/`)
+          fetch(`http://${IP}/club/mesas/`),
+          fetch(`http://${IP}/club/bloques/`)
         ]);
         const mesasData = await mesasResponse.json();
         const bloquesData = await bloquesResponse.json();

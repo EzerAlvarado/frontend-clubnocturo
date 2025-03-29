@@ -36,7 +36,7 @@ const MenuBebidas = ({ navigation, route }) => {
 
   const fetchProductos = async () => {
     try {
-      const response = await fetch(`http://${IP}:8000/club/productos/`);
+      const response = await fetch(`http://${IP}/club/productos/`);
       if (!response.ok) {
         throw new Error("Error al obtener los productos");
       }
@@ -133,7 +133,7 @@ const MenuBebidas = ({ navigation, route }) => {
   
         console.log("Datos enviados al servidor:", JSON.stringify(datosOrden, null, 2)); // Depuración
   
-        const response = await fetch(`http://${IP}:8000/club/ordenes/crear/`, {
+        const response = await fetch(`http://${IP}/club/ordenes/crear/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

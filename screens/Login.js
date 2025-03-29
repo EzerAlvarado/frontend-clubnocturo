@@ -15,7 +15,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch(`http://${IP}:8000/club/usuarios/`);
+      const response = await fetch(`http://${IP}/club/usuarios/`);
       const usuarios = await response.json();
 
       const usuarioEncontrado = usuarios.find(

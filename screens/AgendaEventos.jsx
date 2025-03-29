@@ -26,7 +26,7 @@ const AgendaEventos = () => {
   // Función para cargar los eventos del backend
   const loadEvents = async () => {
     try {
-      const response = await fetch(`http://${IP}:8000/club/eventos/`);
+      const response = await fetch(`http://${IP}/club/eventos/`);
       if (!response.ok) {
         Alert.alert("Error", "No se pudieron cargar los eventos.");
         return;

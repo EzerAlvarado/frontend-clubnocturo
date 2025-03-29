@@ -10,7 +10,7 @@ const BartenderScreen = () => {
   // Función para obtener las órdenes desde la API
   const fetchOrders = async () => {
     try {
-      const response = await fetch(`http://${IP}:8000/club/ordenes-de-compra/`);
+      const response = await fetch(`http://${IP}/club/ordenes-de-compra/`);
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
