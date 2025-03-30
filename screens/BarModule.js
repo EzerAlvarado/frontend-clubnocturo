@@ -72,7 +72,7 @@ const BartenderScreen = () => {
 
       // Marcar cada orden como lista para pagar
       for (const order of mesaOrders) {
-        const response = await fetch(`http://${IP}:8000/club/ordenes-de-compra/${order.id}/`, {
+        const response = await fetch(`http://${IP}/club/ordenes-de-compra/${order.id}/`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",

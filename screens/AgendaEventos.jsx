@@ -51,7 +51,7 @@ const AgendaEventos = () => {
   // Función para eliminar un evento
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://${IP}:8000/club/eventos/${id}/`, {
+      const response = await fetch(`http://${IP}/club/eventos/${id}/`, {
         method: 'DELETE',
       });
       if (!response.ok) {
