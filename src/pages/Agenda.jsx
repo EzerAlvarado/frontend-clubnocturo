@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import '../styles/AgendaEventos.css'; // Estilos CSS
+import '../styles/global.css';
 
 const AgendaEventos = () => {
   const [events, setEvents] = useState([]);

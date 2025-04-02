@@ -1,3 +1,5 @@
+/* Login.css - Optimized */
+
 /* Estilos generales */
 html, body {
   margin: 0;
@@ -5,16 +7,15 @@ html, body {
   height: 100%;
   width: 100%;
   overflow-x: hidden; /* Prevenir scroll horizontal */
-  /* Permitir scroll vertical cuando sea necesario */
 }
 
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh; /* Usar min-height en lugar de height */
+  min-height: 100vh;
   width: 100%;
-  background-color: #18243a;
+  background-color: var(--color-primario);
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -22,17 +23,16 @@ html, body {
 
 /* Tarjeta de login */
 .login-card {
-  background-color: #2a3d61;
+  background-color: var(--color-dark-blue);
   border-radius: 15px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   padding: 40px;
   width: 100%;
   max-width: 400px;
   text-align: center;
-  box-sizing: border-box; /* Incluir padding en el ancho total */
+  box-sizing: border-box;
 }
 
-/* Resto del CSS permanece igual */
 .login-header {
   margin-bottom: 30px;
 }
@@ -87,7 +87,7 @@ html, body {
 }
 
 .form-input:focus {
-  border-color: #259588;
+  border-color: var(--color-teal);
   outline: none;
 }
 
@@ -96,7 +96,7 @@ html, body {
   padding: 12px;
   border-radius: 8px;
   border: none;
-  background-color: #259588;
+  background-color: var(--color-teal);
   color: #ffffff;
   font-size: 16px;
   font-weight: 600;
@@ -107,4 +107,20 @@ html, body {
 
 .login-button:hover {
   background-color: #1e7a6e;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 30px 20px;
+  }
+  
+  .login-title {
+    font-size: 22px;
+  }
+  
+  .form-input,
+  .login-button {
+    padding: 10px;
+  }
 }

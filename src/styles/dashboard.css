@@ -1,26 +1,6 @@
-/* dashboard.css - Actualizado con el estilo compartido */
+/* dashboard.css - Optimized */
 
-/* Variables globales */
-:root {
-  --color-primario: #3f51b5;
-  --color-secundario: #ff4081;
-  --color-texto: #333333;
-  --color-fondo: #f8f9fa;
-  --color-exito: #4CAF50;
-  --color-error: #FF5252;
-  --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --borde-radio: 12px;
-  --transicion: all 0.3s ease;
-}
-
-/* Estilos generales */
-body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--color-fondo);
-  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  color: var(--color-texto);
-}
+/* Using global variables from global.css */
 
 .dashboard-container {
   max-width: 1400px;
@@ -28,50 +8,18 @@ body {
   padding: 20px;
 }
 
-/* Títulos */
+/* Using common title styles from global.css */
 .dashboard-title {
-  font-size: 28px;
-  font-weight: 600;
-  color: var(--color-primario);
-  margin-bottom: 25px;
-  position: relative;
-  padding-bottom: 10px;
-  text-transform: capitalize;
-}
-
-.dashboard-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 60px;
-  height: 4px;
-  background-color: var(--color-secundario);
-  border-radius: 2px;
+  /* Inherits from .section-title in global.css */
 }
 
 .chart-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--color-primario);
-  margin-bottom: 15px;
+  /* Inherits from .sub-title in global.css */
 }
 
-/* Contenedores de gráficos */
+/* Chart containers */
 .chart-container {
-  background-color: white;
-  border-radius: var(--borde-radio);
-  padding: 20px;
-  box-shadow: var(--sombra-suave);
-  height: 100%;
-  transition: var(--transicion);
-  border-left: 3px solid var(--color-primario);
-  margin-bottom: 20px;
-}
-
-.chart-container:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  /* Inherits from .container-box in global.css */
 }
 
 /* Tarjetas de información */
@@ -161,44 +109,21 @@ body {
   border-radius: var(--borde-radio) !important;
 }
 
-/* Animaciones */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
+/* Utilizamos la animación fadeIn definida en global.css */
 .dashboard-container > * {
   animation: fadeIn 0.5s ease-out forwards;
 }
 
-/* Responsive */
-@media (max-width: 992px) {
-  .dashboard-container {
-    padding: 15px;
-  }
-}
-
+/* Media queries consistency with global.css */
 @media (max-width: 768px) {
-  .dashboard-title {
-    font-size: 24px;
-  }
-  
   .dashboard-card .card-value {
     font-size: 24px;
-  }
-  
-  .chart-container {
-    padding: 15px;
   }
 }
 
 @media (max-width: 480px) {
-  .dashboard-title {
-    font-size: 22px;
-  }
-  
-  .chart-title {
-    font-size: 18px;
+  .chart-container {
+    padding: 12px;
   }
   
   .dashboard-card {
@@ -211,9 +136,5 @@ body {
   
   .dashboard-card .card-value {
     font-size: 22px;
-  }
-  
-  .chart-container {
-    padding: 12px;
   }
 }

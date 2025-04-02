@@ -1,23 +1,6 @@
-/* Estilos generales con diseño moderno */
-:root {
-  --color-primario: #18243a;
-  --color-secundario: #ff4081;
-  --color-texto: #333333;
-  --color-fondo: #f8f9fa;
-  --color-exito: #4CAF50;
-  --color-error: #FF5252;
-  --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --borde-radio: 12px;
-  --transicion: all 0.3s ease;
-}
+/* AgendaEventos.css - Optimized */
 
-body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--color-fondo);
-  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  color: var(--color-texto);
-}
+/* Import global variables and styles from global.css instead of redefining them */
 
 .agenda-container {
   max-width: 1400px;
@@ -33,7 +16,7 @@ body {
   flex: 3;
   min-width: 320px;
   padding: 25px;
-  background-color:#e1e1e1;
+  background-color: #e1e1e1;
   border-radius: var(--borde-radio);
   box-shadow: var(--sombra-suave);
   overflow-y: auto;
@@ -70,7 +53,7 @@ body {
   box-shadow: var(--sombra-suave);
   border-left: 3px solid var(--color-primario);
   transition: var(--transicion);
-  position:relative;
+  position: relative;
   overflow: hidden;
 }
 
@@ -148,7 +131,7 @@ body {
   border: none !important;
   border-radius: var(--borde-radio) !important;
   padding: 15px !important;
-  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif !important;
+  font-family: var(--primary-font) !important;
   box-shadow: var(--sombra-suave) !important;
 }
 
@@ -237,8 +220,6 @@ body {
   text-decoration: none !important;
 }
 
-
-
 /* Ajustes responsivos mejorados */
 @media (max-width: 992px) {
   .agenda-container {
@@ -262,10 +243,6 @@ body {
     padding: 15px;
   }
   
-  .events-list h1 {
-    font-size: 24px;
-  }
-  
   .card-titulo {
     font-size: 18px;
   }
@@ -279,10 +256,6 @@ body {
 @media (max-width: 480px) {
   .events-list, .calendar-container {
     padding: 15px;
-  }
-  
-  .events-list h1 {
-    font-size: 22px;
   }
   
   .event-card {

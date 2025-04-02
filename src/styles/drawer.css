@@ -1,17 +1,19 @@
+/* drawer.css - Optimized */
+
 /* Estilos para el Drawer */
 .drawer {
-  background-color: #18243a;
+  background-color: var(--color-primario);
   color: white;
   padding: 20px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
+  transition: var(--transicion);
 }
 
 /* Estilos para pantallas grandes (md y superiores) */
 @media (min-width: 768px) {
   .drawer {
     height: 100vh;
-    width: 250px;
+    width: 190px;
     position: sticky;
     top: 0;
   }
@@ -23,6 +25,10 @@
     width: 100%;
     height: auto;
     border-radius: 0 0 10px 10px;
+  }
+  
+  .drawer.open {
+    animation: slideIn 0.3s forwards; /* Animation defined in global.css */
   }
 }
 
@@ -36,7 +42,7 @@
   padding: 12px 15px;
   margin: 8px 0;
   border-radius: 6px;
-  transition: all 0.3s ease;
+  transition: var(--transicion);
   display: flex;
   align-items: center;
   font-weight: 500;
@@ -58,16 +64,4 @@
 .drawer .nav-link svg {
   margin-right: 10px;
   font-size: 1.1em;
-}
-
-/* Animación de entrada para el drawer en móvil */
-@keyframes slideIn {
-  from { transform: translateY(-20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@media (max-width: 767.98px) {
-  .drawer.open {
-    animation: slideIn 0.3s forwards;
-  }
 }

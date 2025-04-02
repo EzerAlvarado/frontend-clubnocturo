@@ -1,40 +1,56 @@
-/* Estilos para el componente Users */
+/* users.css - Optimized */
+
+/* Using global variables from global.css */
 .users-container {
-  padding: var(--content-padding, 1.5rem);
-  background-color: var(--container-background, #fff);
-  border-radius: var(--border-radius, 8px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  margin-bottom: 2rem;
+  padding: var(--content-padding);
+  background-color: white;
+  border-radius: var(--borde-radio);
+  box-shadow: var(--sombra-suave);
+  margin-bottom: var(--base-spacing);
+  animation: fadeIn 0.5s ease-out forwards;
 }
 
 .users-container h1 {
-  color: #2c3e50;
+  color: var(--color-primario);
   margin-bottom: 1.5rem;
   font-size: 1.8rem;
   font-weight: 600;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.users-container h1::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background-color: var(--color-secundario);
+  border-radius: 2px;
 }
 
 /* Estilos para el botón de agregar */
 .users-container > button {
   margin-bottom: 1.5rem;
-  background-color:#259588;
-  border-color: #259588;
+  background-color: var(--color-teal);
+  border-color: var(--color-teal);
   font-weight: 500;
   padding: 0.5rem 1rem;
-  transition: all 0.3s ease;
+  transition: var(--transicion);
 }
 
 .users-container > button:hover {
   background-color: #218579;
   border-color: #218579;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--sombra-suave);
 }
 
 /* Estilos para la tabla de usuarios */
 .users-container .table-responsive {
   margin-top: 1.5rem;
-  border-radius: 8px;
+  border-radius: var(--borde-radio);
   overflow: hidden;
 }
 
@@ -42,10 +58,11 @@
   margin-bottom: 0;
   border-collapse: separate;
   border-spacing: 0;
+  width: 100%;
 }
 
 .user-table thead {
-  background-color: #34495e;
+  background-color: var(--color-table-header);
   color: white;
 }
 
@@ -59,7 +76,7 @@
 }
 
 .user-table tbody tr {
-  transition: background-color 0.2s ease;
+  transition: var(--transicion);
 }
 
 .user-table tbody tr:hover {
@@ -81,11 +98,12 @@
   padding: 0.3rem 0.75rem;
   margin-right: 0.5rem;
   border-radius: 4px;
+  transition: var(--transicion);
 }
 
 .user-table td button.btn-warning {
-  background-color: #2a3d61;
-  border-color: #2a3d61;
+  background-color: var(--color-dark-blue);
+  border-color: var(--color-dark-blue);
   color: white;
 }
 
@@ -95,8 +113,8 @@
 }
 
 .user-table td button.btn-danger {
-  background-color: #ff1d65;
-  border-color: #ff1d65;
+  background-color: var(--color-pink);
+  border-color: var(--color-pink);
 }
 
 .user-table td button.btn-danger:hover {
@@ -104,7 +122,7 @@
   border-color: #e91a5b;
 }
 
-/* Estilos para pantallas medianas */
+/* Enhanced responsive styling */
 @media (max-width: 992px) {
   .users-container h1 {
     font-size: 1.6rem;
@@ -116,10 +134,9 @@
   }
 }
 
-/* Estilos para pantallas pequeñas */
 @media (max-width: 768px) {
   .users-container {
-    padding: 1rem;
+    padding: var(--content-padding);
   }
   
   .users-container h1 {
@@ -132,16 +149,49 @@
     width: 100%;
   }
   
-  .user-table td button {
-    padding: 0.2rem 0.5rem;
+  .user-table th {
     font-size: 0.8rem;
-    display: block;
-    width: 100%;
-    margin-bottom: 0.5rem;
-    margin-right: 0;
+    padding: 8px 10px;
   }
   
-  .user-table td button:last-child {
-    margin-bottom: 0;
+  .user-table td {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .user-table td:not(:last-child) {
+    display: none;
+  }
+  
+  .user-table th:not(:last-child) {
+    display: none;
+  }
+  
+  .user-table td:last-child {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+  }
+  
+  .user-table td button {
+    margin: 5px;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .users-container {
+    padding: 12px;
+  }
+  
+  .users-container h1 {
+    font-size: 1.2rem;
+  }
+  
+  .user-table td button {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
   }
 }

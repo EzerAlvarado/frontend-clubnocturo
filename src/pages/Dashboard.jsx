@@ -12,6 +12,7 @@ function Dashboard() {
   const [tickets, setTickets] = useState([]);
   const [ordenes, setOrdenes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true); // Estado para controlar la carga inicial
   const [ventasRegistradas, setVentasRegistradas] = useState(0);
   const [gananciasDelDia, setGananciasDelDia] = useState(0);
   const [gananciasHora, setGananciasHora] = useState([]);
@@ -67,10 +68,13 @@ function Dashboard() {
     );
   };
 
-  // Nueva función de fetchData actualizada para ser reutilizable
+  // Nueva función de fetchData actualizada para solo mostrar loading en la carga inicial
   const fetchData = useCallback(async () => {
     try {
-      setLoading(true);
+      // Solo activar loading si es la carga inicial
+      if (initialLoad) {
+        setLoading(true);
+      }
       
       const ticketsResponse = await axios.get('http://tk4gscwgcoc0s08c00gskg8o.31.170.165.191.sslip.io/club/tickets/');
       const ordenesResponse = await axios.get('http://tk4gscwgcoc0s08c00gskg8o.31.170.165.191.sslip.io/club/ordenes-de-compra/');
@@ -80,12 +84,20 @@ function Dashboard() {
       procesarDatos(ticketsResponse.data, ordenesResponse.data);
       
       setUltimaActualizacion(new Date());
-      setLoading(false);
+      
+      // Después de la primera carga, desactivar initialLoad
+      if (initialLoad) {
+        setLoading(false);
+        setInitialLoad(false);
+      }
     } catch (error) {
       console.error('Error al obtener datos:', error);
-      setLoading(false);
+      if (initialLoad) {
+        setLoading(false);
+        setInitialLoad(false);
+      }
     }
-  }, []);
+  }, [initialLoad]);
 
   // Efecto para la carga inicial y actualización periódica
   useEffect(() => {
@@ -234,7 +246,7 @@ function Dashboard() {
                 month: 'long' 
               })}
             </h1>
-            <div className="text-light text-right">
+            <div className="dashboard-title">
               Última actualización: {ultimaActualizacion.toLocaleTimeString('es-MX')}
             </div>
           </Col>
@@ -287,7 +299,8 @@ function Dashboard() {
                           name="Ganancias" 
                           fill="#3498db" 
                           radius={[5, 5, 0, 0]}
-                          animationDuration={1500}
+                          animationDuration={0} // Desactivar animación
+                          isAnimationActive={false} // Desactivar completamente la animación
                         />
                       </BarChart>
                     </ResponsiveContainer>
@@ -315,7 +328,8 @@ function Dashboard() {
                           dataKey="cantidad"
                           nameKey="nombre"
                           label={renderCustomizedLabel}
-                          animationDuration={1500}
+                          animationDuration={0} // Desactivar animación
+                          isAnimationActive={false} // Desactivar completamente la animación
                         >
                           {bebidasPopulares.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -360,6 +374,8 @@ function Dashboard() {
                           strokeWidth={3}
                           dot={{ stroke: '#e74c3c', strokeWidth: 2, r: 5 }}
                           activeDot={{ r: 8 }}
+                          animationDuration={0} // Desactivar animación
+                          isAnimationActive={false} // Desactivar completamente la animación
                         />
                       </LineChart>
                     </ResponsiveContainer>
