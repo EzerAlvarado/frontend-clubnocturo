@@ -1,4 +1,4 @@
-/* users.css - Optimized */
+/* users.css - Optimizado para responsividad */
 
 /* Using global variables from global.css */
 .users-container {
@@ -8,12 +8,15 @@
   box-shadow: var(--sombra-suave);
   margin-bottom: var(--base-spacing);
   animation: fadeIn 0.5s ease-out forwards;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .users-container h1 {
   color: var(--color-primario);
-  margin-bottom: 1.5rem;
-  font-size: 1.8rem;
+  margin-bottom: clamp(1rem, 4vw, 1.5rem);
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
   font-weight: 600;
   position: relative;
   padding-bottom: 10px;
@@ -24,7 +27,7 @@
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 60px;
+  width: clamp(40px, 15%, 60px);
   height: 4px;
   background-color: var(--color-secundario);
   border-radius: 2px;
@@ -32,12 +35,15 @@
 
 /* Estilos para el botón de agregar */
 .users-container > button {
-  margin-bottom: 1.5rem;
+  margin-bottom: clamp(1rem, 3vw, 1.5rem);
   background-color: var(--color-teal);
   border-color: var(--color-teal);
   font-weight: 500;
   padding: 0.5rem 1rem;
   transition: var(--transicion);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .users-container > button:hover {
@@ -49,9 +55,11 @@
 
 /* Estilos para la tabla de usuarios */
 .users-container .table-responsive {
-  margin-top: 1.5rem;
+  margin-top: clamp(1rem, 3vw, 1.5rem);
   border-radius: var(--borde-radio);
-  overflow: hidden;
+  overflow-x: auto;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 .user-table {
@@ -59,6 +67,7 @@
   border-collapse: separate;
   border-spacing: 0;
   width: 100%;
+  min-width: 500px; /* Asegura un mínimo ancho para la tabla */
 }
 
 .user-table thead {
@@ -67,12 +76,13 @@
 }
 
 .user-table th {
-  padding: 12px 15px;
+  padding: clamp(8px, 2vw, 12px) clamp(10px, 2vw, 15px);
   border: none;
   font-weight: 500;
   text-transform: uppercase;
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 1.5vw, 0.85rem);
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .user-table tbody tr {
@@ -84,21 +94,30 @@
 }
 
 .user-table td {
-  padding: 12px 15px;
+  padding: clamp(8px, 2vw, 12px) clamp(10px, 2vw, 15px);
   vertical-align: middle;
   border-top: 1px solid #eee;
   border-bottom: 1px solid #eee;
   border-left: none;
   border-right: none;
+  font-size: clamp(0.8rem, 1.5vw, 1rem);
 }
 
 /* Estilos para los botones de acción */
+.user-table .action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-start;
+}
+
 .user-table td button {
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 1.5vw, 0.85rem);
   padding: 0.3rem 0.75rem;
-  margin-right: 0.5rem;
   border-radius: 4px;
   transition: var(--transicion);
+  white-space: nowrap;
+  flex: 0 1 auto;
 }
 
 .user-table td button.btn-warning {
@@ -122,76 +141,109 @@
   border-color: #e91a5b;
 }
 
-/* Enhanced responsive styling */
+/* Estilos responsivos mejorados */
 @media (max-width: 992px) {
-  .users-container h1 {
-    font-size: 1.6rem;
-  }
-  
-  .user-table th, .user-table td {
-    padding: 10px 12px;
-    font-size: 0.9rem;
+  .user-table {
+    min-width: 450px;
   }
 }
 
 @media (max-width: 768px) {
   .users-container {
-    padding: var(--content-padding);
-  }
-  
-  .users-container h1 {
-    font-size: 1.4rem;
-    margin-bottom: 1rem;
+    padding: clamp(12px, 3vw, var(--content-padding));
   }
   
   .users-container > button {
-    margin-bottom: 1rem;
     width: 100%;
+    max-width: 100%;
   }
   
-  .user-table th {
-    font-size: 0.8rem;
-    padding: 8px 10px;
+  .user-table {
+    min-width: 400px;
+  }
+}
+
+/* Estilo para dispositivos pequeños con enfoque en los botones */
+@media (max-width: 576px) {
+  .user-table {
+    min-width: 300px;
+  }
+  
+  /* Tabla adaptativa para móviles */
+  .user-table thead {
+    display: none;
+  }
+  
+  .user-table, 
+  .user-table tbody, 
+  .user-table tr, 
+  .user-table td {
+    display: block;
+    width: 100%;
+    text-align: right;
+  }
+  
+  .user-table tr {
+    margin-bottom: 1rem;
+    border: 1px solid #eee;
+    border-radius: var(--borde-radio);
+    padding: 0.5rem;
   }
   
   .user-table td {
-    padding: 8px 10px;
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .user-table td:not(:last-child) {
-    display: none;
-  }
-  
-  .user-table th:not(:last-child) {
-    display: none;
+    position: relative;
+    padding-left: 50%;
+    text-align: right;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
   }
   
   .user-table td:last-child {
+    border-bottom: none;
+    padding-left: 0;
     display: flex;
-    justify-content: center;
-    padding: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
   
-  .user-table td button {
-    margin: 5px;
-    padding: 0.4rem 0.8rem;
+  /* Añadir etiquetas para cada celda en móvil */
+  .user-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 45%;
+    padding-right: 10px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-primario);
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 360px) {
   .users-container {
-    padding: 12px;
+    padding: 10px;
   }
   
-  .users-container h1 {
-    font-size: 1.2rem;
+  .user-table td {
+    padding: 8px 5px 8px 45%;
+    font-size: 0.75rem;
   }
   
   .user-table td button {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+}
+
+/* Animación de fadeIn */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
