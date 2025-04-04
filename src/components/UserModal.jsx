@@ -223,7 +223,7 @@ function UserModal({ show, handleClose, user, handleSubmit }) {
                   >
                     <option value="">Seleccione un Rol</option>
                     <option value="M">Mesero</option>
-                    <option value="C">Caja</option>
+                    <option value="C">Recepcion</option>
                     <option value="B">Bartender</option>
                   </Form.Select>
                   <Form.Control.Feedback type="invalid">
