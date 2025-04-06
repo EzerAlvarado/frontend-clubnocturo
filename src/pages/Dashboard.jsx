@@ -11,6 +11,7 @@ import axios from 'axios';
 function Dashboard() {
   const [tickets, setTickets] = useState([]);
   const [ordenes, setOrdenes] = useState([]);
+  const [ordenesHistorico, setOrdenesHistorico] = useState([]);
   const [loading, setLoading] = useState(true);
   const [initialLoad, setInitialLoad] = useState(true); // Estado para controlar la carga inicial
   const [ventasRegistradas, setVentasRegistradas] = useState(0);
@@ -21,6 +22,25 @@ function Dashboard() {
   const [ultimaActualizacion, setUltimaActualizacion] = useState(new Date());
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#FF5733'];
+
+  // Cargar el histórico de órdenes desde localStorage al iniciar
+  useEffect(() => {
+    const historico = localStorage.getItem('ordenesHistorico');
+    if (historico) {
+      try {
+        setOrdenesHistorico(JSON.parse(historico));
+      } catch (e) {
+        console.error('Error al cargar histórico desde localStorage:', e);
+      }
+    }
+  }, []);
+
+  // Guardar el histórico en localStorage cuando cambie
+  useEffect(() => {
+    if (ordenesHistorico.length > 0) {
+      localStorage.setItem('ordenesHistorico', JSON.stringify(ordenesHistorico));
+    }
+  }, [ordenesHistorico]);
 
   // Componentes para los Tooltips
   const CustomTooltip = ({ active, payload, label }) => {
@@ -68,7 +88,8 @@ function Dashboard() {
     );
   };
 
-  // Nueva función de fetchData actualizada para solo mostrar loading en la carga inicial
+  // Función fetchData modificada para usar el nuevo endpoint con estado=pagado
+  // y actualizar la hora solo cuando hay datos nuevos
   const fetchData = useCallback(async () => {
     try {
       // Solo activar loading si es la carga inicial
@@ -77,13 +98,47 @@ function Dashboard() {
       }
       
       const ticketsResponse = await axios.get('http://tk4gscwgcoc0s08c00gskg8o.31.170.165.191.sslip.io/club/tickets/');
-      const ordenesResponse = await axios.get('http://tk4gscwgcoc0s08c00gskg8o.31.170.165.191.sslip.io/club/ordenes-de-compra/');
+      // Usar el nuevo endpoint con filtro de estado=pagado
+      const ordenesResponse = await axios.get('http://tk4gscwgcoc0s08c00gskg8o.31.170.165.191.sslip.io/club/ordenes-de-compra/?estado=pagado');
       
       setTickets(ticketsResponse.data);
-      setOrdenes(ordenesResponse.data);
-      procesarDatos(ticketsResponse.data, ordenesResponse.data);
       
-      setUltimaActualizacion(new Date());
+      // Procesar las nuevas órdenes y agregarlas al histórico
+      let nuevasOrdenes = [];
+      if (Array.isArray(ordenesResponse.data)) {
+        // Si la respuesta ya es un array, usarla directamente
+        nuevasOrdenes = ordenesResponse.data;
+      } else if (typeof ordenesResponse.data === 'object') {
+        // Si es un objeto, procesar sus valores
+        Object.values(ordenesResponse.data).forEach(ordenesGrupo => {
+          if (Array.isArray(ordenesGrupo)) {
+            nuevasOrdenes = [...nuevasOrdenes, ...ordenesGrupo];
+          }
+        });
+      }
+      
+      // Filtrar para evitar duplicados usando algún identificador único como id
+      const getOrdenId = (orden) => {
+        return orden.id || `${orden.nombre_producto}-${orden.fecha_de_orden}-${orden.cantidad}`;
+      };
+      
+      const ordenesExistentesIds = new Set(ordenesHistorico.map(orden => getOrdenId(orden)));
+      const ordenesUnicas = nuevasOrdenes.filter(orden => !ordenesExistentesIds.has(getOrdenId(orden)));
+      
+      // Actualizar ultimaActualizacion solo si hay nuevas órdenes o es la primera carga
+      if (ordenesUnicas.length > 0 || initialLoad) {
+        setUltimaActualizacion(new Date());
+      }
+      
+      // Actualizar el histórico
+      const historico = [...ordenesHistorico, ...ordenesUnicas];
+      setOrdenesHistorico(historico);
+      
+      // Guardar también las órdenes actuales
+      setOrdenes(ordenesResponse.data);
+      
+      // Usar el histórico para procesar los datos
+      procesarDatos(ticketsResponse.data, historico);
       
       // Después de la primera carga, desactivar initialLoad
       if (initialLoad) {
@@ -97,7 +152,7 @@ function Dashboard() {
         setInitialLoad(false);
       }
     }
-  }, [initialLoad]);
+  }, [initialLoad, ordenesHistorico]);
 
   // Efecto para la carga inicial y actualización periódica
   useEffect(() => {
@@ -133,7 +188,7 @@ function Dashboard() {
     });
   };
 
-  const procesarDatos = (ticketsData, ordenesData) => {
+  const procesarDatos = (ticketsData, historicoOrdenes) => {
     // Obtener fecha actual (inicio del día en hora local)
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
@@ -168,7 +223,8 @@ function Dashboard() {
     const gananciasMinutales = calcularGananciasMinuto(ticketsHoy);
     setGananciasMinuto(gananciasMinutales);
 
-    const bebidasSemanales = calcularBebidasPopulares(ordenesData);
+    // Usar el histórico de órdenes para bebidas populares
+    const bebidasSemanales = calcularBebidasPopulares(historicoOrdenes);
     setBebidasPopulares(bebidasSemanales);
   };
 
@@ -200,29 +256,40 @@ function Dashboard() {
     });
   };
 
-  const calcularBebidasPopulares = (ordenesData) => {
+  // Función actualizada para usar directamente el histórico de órdenes
+  const calcularBebidasPopulares = (historicoOrdenes) => {
     const unaSemanaAtras = new Date();
     unaSemanaAtras.setDate(unaSemanaAtras.getDate() - 7);
     
-    let todasLasOrdenes = [];
-    Object.values(ordenesData).forEach(ordenesGrupo => {
-      todasLasOrdenes = [...todasLasOrdenes, ...ordenesGrupo];
-    });
+    // Asegurarse de que historicoOrdenes es un array
+    if (!Array.isArray(historicoOrdenes)) {
+      console.error('historicoOrdenes no es un array:', historicoOrdenes);
+      return [];
+    }
     
-    const ordenesSemana = todasLasOrdenes.filter(orden => {
+    const ordenesSemana = historicoOrdenes.filter(orden => {
       try {
+        if (!orden || !orden.fecha_de_orden) {
+          return false;
+        }
+        
         const fechaOrden = new Date(orden.fecha_de_orden);
         return fechaOrden >= unaSemanaAtras;
       } catch (e) {
-        console.error('Error al parsear fecha de orden:', orden.fecha_de_orden, e);
+        console.error('Error al parsear fecha de orden:', orden?.fecha_de_orden, e);
         return false;
       }
     });
     
+    // Debugging
+    console.log(`Total órdenes históricas: ${historicoOrdenes.length}, Órdenes de la última semana: ${ordenesSemana.length}`);
+    
     const contadorBebidas = {};
     ordenesSemana.forEach(orden => {
       const nombreBebida = orden.nombre_producto;
-      contadorBebidas[nombreBebida] = (contadorBebidas[nombreBebida] || 0) + orden.cantidad;
+      if (nombreBebida) {
+        contadorBebidas[nombreBebida] = (contadorBebidas[nombreBebida] || 0) + (orden.cantidad || 1);
+      }
     });
     
     return Object.keys(contadorBebidas)
@@ -237,6 +304,7 @@ function Dashboard() {
   return (
     <div>
       <Container fluid className="dashboard-container">
+        {/* Header Section */}
         <Row className="mb-4">
           <Col xs={12}>
             <h1 className="dashboard-title">
@@ -258,6 +326,7 @@ function Dashboard() {
           </div>
         ) : (
           <>
+            {/* KPI Cards Section - Symmetrical layout */}
             <Row className="mb-4">
               <Col xs={12} md={6} className="mb-3">
                 <DashboardCard 
@@ -277,8 +346,10 @@ function Dashboard() {
               </Col>
             </Row>
             
+            {/* Main Charts Section - Symmetrical side-by-side charts */}
             <Row className="mb-4">
-              <Col xs={12} lg={8} className="mb-4">
+              {/* Left side - Hourly Chart */}
+              <Col xs={12} md={6} className="mb-4">
                 <div className="chart-container">
                   <h2 className="chart-title">Ganancias del Día por Hora</h2>
                   {gananciasHora.length > 0 ? (
@@ -299,8 +370,8 @@ function Dashboard() {
                           name="Ganancias" 
                           fill="#3498db" 
                           radius={[5, 5, 0, 0]}
-                          animationDuration={0} // Desactivar animación
-                          isAnimationActive={false} // Desactivar completamente la animación
+                          animationDuration={0}
+                          isAnimationActive={false}
                         />
                       </BarChart>
                     </ResponsiveContainer>
@@ -312,7 +383,8 @@ function Dashboard() {
                 </div>
               </Col>
               
-              <Col xs={12} lg={4} className="mb-4">
+              {/* Right side - Pie Chart */}
+              <Col xs={12} md={6} className="mb-4">
                 <div className="chart-container">
                   <h2 className="chart-title">Bebidas Más Populares (última semana)</h2>
                   {bebidasPopulares.length > 0 ? (
@@ -328,8 +400,8 @@ function Dashboard() {
                           dataKey="cantidad"
                           nameKey="nombre"
                           label={renderCustomizedLabel}
-                          animationDuration={0} // Desactivar animación
-                          isAnimationActive={false} // Desactivar completamente la animación
+                          animationDuration={0}
+                          isAnimationActive={false}
                         >
                           {bebidasPopulares.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -347,8 +419,9 @@ function Dashboard() {
               </Col>
             </Row>
 
+            {/* Bottom Full-width Chart Section */}
             <Row className="mb-4">
-              <Col xs={12} lg={12} className="mb-4">
+              <Col xs={12} className="mb-4">
                 <div className="chart-container">
                   <h2 className="chart-title">Ganancias del Día por Minuto</h2>
                   {gananciasMinuto.length > 0 ? (
@@ -374,8 +447,8 @@ function Dashboard() {
                           strokeWidth={3}
                           dot={{ stroke: '#e74c3c', strokeWidth: 2, r: 5 }}
                           activeDot={{ r: 8 }}
-                          animationDuration={0} // Desactivar animación
-                          isAnimationActive={false} // Desactivar completamente la animación
+                          animationDuration={0}
+                          isAnimationActive={false}
                         />
                       </LineChart>
                     </ResponsiveContainer>
