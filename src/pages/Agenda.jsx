@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import '../styles/AgendaEventos.css'; // Estilos CSS
+import '../styles/AgendaEventos.css'; 
 import '../styles/global.css';
 
 const AgendaEventos = () => {
@@ -36,7 +36,7 @@ const AgendaEventos = () => {
 
   return (
     <div className="agenda-container">
-      {/* Lista de eventos a la izquierda */}
+
       <div className="events-list">
         <h1>Próximos eventos</h1>
         {events.map((event) => {
@@ -63,7 +63,7 @@ const AgendaEventos = () => {
         })}
       </div>
 
-      {/* Calendario a la derecha */}
+
       <div className="calendar-container">
         <Calendar
           className="custom-calendar"

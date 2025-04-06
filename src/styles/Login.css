@@ -1,12 +1,10 @@
-/* Login.css - Optimized */
 
-/* Estilos generales */
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
-  overflow-x: hidden; /* Prevenir scroll horizontal */
+  overflow-x: hidden; 
 }
 
 .login-container {
@@ -21,7 +19,7 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Tarjeta de login */
+
 .login-card {
   background-color: var(--color-dark-blue);
   border-radius: 15px;
@@ -109,7 +107,7 @@ html, body {
   background-color: #1e7a6e;
 }
 
-/* Responsive adjustments */
+
 @media (max-width: 480px) {
   .login-card {
     padding: 30px 20px;

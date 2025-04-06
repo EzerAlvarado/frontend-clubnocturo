@@ -1,6 +1,4 @@
-/* users.css - Optimizado para responsividad */
 
-/* Using global variables from global.css */
 .users-container {
   padding: var(--content-padding);
   background-color: white;
@@ -33,7 +31,7 @@
   border-radius: 2px;
 }
 
-/* Estilos para el botón de agregar */
+
 .users-container > button {
   margin-bottom: clamp(1rem, 3vw, 1.5rem);
   background-color: var(--color-teal);
@@ -53,7 +51,7 @@
   box-shadow: var(--sombra-suave);
 }
 
-/* Estilos para la tabla de usuarios */
+
 .users-container .table-responsive {
   margin-top: clamp(1rem, 3vw, 1.5rem);
   border-radius: var(--borde-radio);
@@ -67,7 +65,7 @@
   border-collapse: separate;
   border-spacing: 0;
   width: 100%;
-  min-width: 500px; /* Asegura un mínimo ancho para la tabla */
+  min-width: 500px; 
 }
 
 .user-table thead {
@@ -103,7 +101,7 @@
   font-size: clamp(0.8rem, 1.5vw, 1rem);
 }
 
-/* Estilos para los botones de acción */
+
 .user-table .action-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -141,7 +139,7 @@
   border-color: #e91a5b;
 }
 
-/* Estilos responsivos mejorados */
+
 @media (max-width: 992px) {
   .user-table {
     min-width: 450px;
@@ -163,13 +161,12 @@
   }
 }
 
-/* Estilo para dispositivos pequeños con enfoque en los botones */
 @media (max-width: 576px) {
   .user-table {
     min-width: 300px;
   }
   
-  /* Tabla adaptativa para móviles */
+ 
   .user-table thead {
     display: none;
   }
@@ -207,7 +204,7 @@
     gap: 0.5rem;
   }
   
-  /* Añadir etiquetas para cada celda en móvil */
+ 
   .user-table td::before {
     content: attr(data-label);
     position: absolute;
@@ -236,7 +233,7 @@
   }
 }
 
-/* Animación de fadeIn */
+
 @keyframes fadeIn {
   from {
     opacity: 0;

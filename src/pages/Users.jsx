@@ -1,4 +1,3 @@
-// Users.js
 import React, { useState, useEffect } from 'react';
 import { Container, Button, Table } from 'react-bootstrap';
 import UserModal from '../components/UserModal';

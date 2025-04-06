@@ -1,8 +1,7 @@
-// src/components/Drawer.jsx
 import React, { useContext } from 'react';
 import { AuthContext } from '../AuthContext';
 import { Nav } from 'react-bootstrap';
-import '../styles/drawer.css'; // Importa los estilos CSS
+import '../styles/drawer.css'; 
 
 const Drawer = () => {
   const { setUser } = useContext(AuthContext);

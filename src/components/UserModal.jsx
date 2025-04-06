@@ -3,7 +3,7 @@ import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 import '../styles/userModal.css';
 
 function UserModal({ show, handleClose, user, handleSubmit }) {
-  // Estados para los campos del formulario
+
   const [formData, setFormData] = useState({
     nombre: '',
     estado_solicitud: '',
@@ -72,7 +72,7 @@ function UserModal({ show, handleClose, user, handleSubmit }) {
     
     switch (name) {
       case 'nombre':
-        // Check if value is a string before using trim()
+
         if (!value || (typeof value === 'string' && !value.trim())) {
           newErrors.nombre = 'El nombre es requerido';
         } else {
@@ -87,7 +87,7 @@ function UserModal({ show, handleClose, user, handleSubmit }) {
         }
         break;
       case 'numero_de_celular':
-        // Check if value is a string before using trim()
+
         if (!value || (typeof value === 'string' && !value.trim())) {
           newErrors.numero_de_celular = 'El número es requerido';
         } else if (typeof value === 'string' && !/^\d{10}$/.test(value)) {
@@ -97,7 +97,7 @@ function UserModal({ show, handleClose, user, handleSubmit }) {
         }
         break;
       case 'correo_cliente':
-        // Check if value is a string before using trim()
+
         if (!value || (typeof value === 'string' && !value.trim())) {
           newErrors.correo_cliente = 'El correo es requerido';
         } else if (typeof value === 'string' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
@@ -115,7 +115,7 @@ function UserModal({ show, handleClose, user, handleSubmit }) {
           delete newErrors.contrasena;
         }
         
-        // Validar también confirmar_contrasena si ya tiene valor
+
         if (formData.confirmar_contrasena && value !== formData.confirmar_contrasena) {
           newErrors.confirmar_contrasena = 'Las contraseñas no coinciden';
         } else if (formData.confirmar_contrasena) {

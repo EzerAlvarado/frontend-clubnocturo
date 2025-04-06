@@ -1,6 +1,4 @@
-/* drawer.css - Optimized */
 
-/* Estilos para el Drawer */
 .drawer {
   background-color: var(--color-primario);
   color: white;
@@ -9,7 +7,7 @@
   transition: var(--transicion);
 }
 
-/* Estilos para pantallas grandes (md y superiores) */
+
 @media (min-width: 768px) {
   .drawer {
     height: 100vh;
@@ -19,7 +17,7 @@
   }
 }
 
-/* Estilos para pantallas pequeñas (sm y menores) */
+
 @media (max-width: 767.98px) {
   .drawer {
     width: 100%;
@@ -28,7 +26,7 @@
   }
   
   .drawer.open {
-    animation: slideIn 0.3s forwards; /* Animation defined in global.css */
+    animation: slideIn 0.3s forwards; 
   }
 }
 

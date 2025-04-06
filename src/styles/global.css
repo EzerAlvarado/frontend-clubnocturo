@@ -1,6 +1,6 @@
-/* global.css - Unified Variables and Base Styles */
+
 :root {
-  /* Colors */
+
   --color-primario: #18243a;
   --color-secundario: #ff4081;
   --color-texto: #333333;
@@ -12,21 +12,19 @@
   --color-teal: #259588;
   --color-table-header: #34495e;
   --color-pink: #ff1d65;
-  
-  /* Spacing and Layout */
+
   --base-spacing: 1rem;
   --content-padding: 1.5rem;
   
-  /* Effects */
+
   --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.1);
   --borde-radio: 12px;
   --transicion: all 0.3s ease;
   
-  /* Typography */
   --primary-font: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
 }
 
-/* Reset and base styles */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -50,7 +48,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Common containers */
+
 .container-box {
   background-color: white;
   border-radius: var(--borde-radio);
@@ -66,7 +64,7 @@ body {
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Common titles */
+
 .section-title {
   font-size: 28px;
   font-weight: 600;
@@ -95,7 +93,7 @@ body {
   margin-bottom: 15px;
 }
 
-/* Responsive breakpoints */
+
 @media (max-width: 992px) {
   body {
     font-size: 15px;
@@ -162,12 +160,11 @@ body {
   }
 }
 
-/* Utility classes */
+
 .section-margin {
   margin-bottom: calc(var(--base-spacing) * 2);
 }
 
-/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
@@ -176,7 +173,6 @@ body {
   }
 }
 
-/* Animation keyframes */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -187,7 +183,7 @@ body {
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* Layout containers */
+
 .main-content-container {
   padding: var(--content-padding);
   background-color: white;

@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../AuthContext';
-import '../styles/Login.css'; // Importa los estilos CSS
+import '../styles/Login.css'; 
 
 const Login = () => {
   const [email, setEmail] = useState('');

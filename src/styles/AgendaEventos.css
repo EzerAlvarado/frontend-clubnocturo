@@ -1,6 +1,3 @@
-/* AgendaEventos.css - Optimized */
-
-/* Import global variables and styles from global.css instead of redefining them */
 
 .agenda-container {
   max-width: 1400px;
@@ -11,7 +8,7 @@
   flex-wrap: wrap;
 }
 
-/* Lista de eventos modernizada */
+
 .events-list {
   flex: 3;
   min-width: 320px;
@@ -110,7 +107,6 @@
   font-size: 14px;
 }
 
-/* Calendario modernizado */
 .calendar-container {
   flex: 1.5;
   min-width: 350px;
@@ -123,7 +119,7 @@
   transition: var(--transicion);
 }
 
-/* Personalización de react-calendar */
+
 .custom-calendar {
   width: 100% !important;
   max-width: 100% !important;
@@ -135,7 +131,7 @@
   box-shadow: var(--sombra-suave) !important;
 }
 
-/* Estilos para la navegación del calendario */
+
 .react-calendar__navigation {
   margin-bottom: 15px !important;
 }
@@ -160,7 +156,7 @@
   color: var(--color-primario) !important;
 }
 
-/* Estilos para los días */
+
 .react-calendar__tile {
   padding: 14px 10px !important;
   font-size: 16px !important;
@@ -187,7 +183,6 @@
   color: white !important;
 }
 
-/* Estilo para fechas con eventos */
 .event-date {
   position: relative;
   background-color: rgba(63, 81, 181, 0.1) !important;
@@ -206,7 +201,7 @@
   border-radius: 50%;
 }
 
-/* Encabezados de días de la semana */
+
 .react-calendar__month-view__weekdays__weekday {
   padding: 10px 0 !important;
   font-weight: 600 !important;
@@ -220,7 +215,6 @@
   text-decoration: none !important;
 }
 
-/* Ajustes responsivos mejorados */
 @media (max-width: 992px) {
   .agenda-container {
     gap: 20px;

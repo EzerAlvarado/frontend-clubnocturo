@@ -1,6 +1,3 @@
-/* dashboard.css - Optimized */
-
-/* Using global variables from global.css */
 
 .dashboard-container {
   max-width: 1400px;
@@ -8,21 +5,20 @@
   padding: 20px;
 }
 
-/* Using common title styles from global.css */
 .dashboard-title {
-  /* Inherits from .section-title in global.css */
+
 }
 
 .chart-title {
-  /* Inherits from .sub-title in global.css */
+
 }
 
-/* Chart containers */
+
 .chart-container {
-  /* Inherits from .container-box in global.css */
+
 }
 
-/* Tarjetas de información */
+
 .dashboard-card {
   background-color: white;
   border-radius: var(--borde-radio);
@@ -68,7 +64,7 @@
   color: var(--color-primario);
 }
 
-/* Tooltips personalizados */
+
 .custom-tooltip {
   background-color: white;
   border-radius: var(--borde-radio);
@@ -88,12 +84,12 @@
   font-weight: 600;
 }
 
-/* Estilo para el contenedor de las tarjetas y gráficos */
+
 .row + .row {
   margin-top: 20px;
 }
 
-/* Adaptación de colores para los gráficos */
+
 .recharts-cartesian-grid-horizontal line,
 .recharts-cartesian-grid-vertical line {
   stroke: #e0e0e0;
@@ -109,12 +105,11 @@
   border-radius: var(--borde-radio) !important;
 }
 
-/* Utilizamos la animación fadeIn definida en global.css */
+
 .dashboard-container > * {
   animation: fadeIn 0.5s ease-out forwards;
 }
 
-/* Media queries consistency with global.css */
 @media (max-width: 768px) {
   .dashboard-card .card-value {
     font-size: 24px;

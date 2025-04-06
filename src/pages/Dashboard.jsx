@@ -13,7 +13,7 @@ function Dashboard() {
   const [ordenes, setOrdenes] = useState([]);
   const [ordenesHistorico, setOrdenesHistorico] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [initialLoad, setInitialLoad] = useState(true); // Estado para controlar la carga inicial
+  const [initialLoad, setInitialLoad] = useState(true); 
   const [ventasRegistradas, setVentasRegistradas] = useState(0);
   const [gananciasDelDia, setGananciasDelDia] = useState(0);
   const [gananciasHora, setGananciasHora] = useState([]);
@@ -23,7 +23,7 @@ function Dashboard() {
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#FF5733'];
 
-  // Cargar el histórico de órdenes desde localStorage al iniciar
+
   useEffect(() => {
     const historico = localStorage.getItem('ordenesHistorico');
     if (historico) {
@@ -35,14 +35,14 @@ function Dashboard() {
     }
   }, []);
 
-  // Guardar el histórico en localStorage cuando cambie
+
   useEffect(() => {
     if (ordenesHistorico.length > 0) {
       localStorage.setItem('ordenesHistorico', JSON.stringify(ordenesHistorico));
     }
   }, [ordenesHistorico]);
 
-  // Componentes para los Tooltips
+
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
@@ -88,25 +88,24 @@ function Dashboard() {
     );
   };
 
-  // Función fetchData modificada para usar el nuevo endpoint con estado=pagado
-  // y actualizar la hora solo cuando hay datos nuevos
+
   const fetchData = useCallback(async () => {
     try {
-      // Solo activar loading si es la carga inicial
+ 
       if (initialLoad) {
         setLoading(true);
       }
       
       const ticketsResponse = await axios.get('http://tk4gscwgcoc0s08c00gskg8o.31.170.165.191.sslip.io/club/tickets/');
-      // Usar el nuevo endpoint con filtro de estado=pagado
+ 
       const ordenesResponse = await axios.get('http://tk4gscwgcoc0s08c00gskg8o.31.170.165.191.sslip.io/club/ordenes-de-compra/?estado=pagado');
       
       setTickets(ticketsResponse.data);
       
-      // Procesar las nuevas órdenes y agregarlas al histórico
+ 
       let nuevasOrdenes = [];
       if (Array.isArray(ordenesResponse.data)) {
-        // Si la respuesta ya es un array, usarla directamente
+
         nuevasOrdenes = ordenesResponse.data;
       } else if (typeof ordenesResponse.data === 'object') {
         // Si es un objeto, procesar sus valores
