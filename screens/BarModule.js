@@ -16,16 +16,23 @@ const BartenderScreen = () => {
       }
       const data = await response.json();
       console.log("Datos recibidos de la API:", data);
-
+  
       // Transformar los datos agrupados por mesa a un array plano
       const allOrders = [];
-      Object.keys(data).forEach(mesa => {
-        data[mesa].forEach(order => {
-          // Solo incluir órdenes donde listo_a_pagar es false
-          if (order.listo_a_pagar === false) {
-            allOrders.push(order);
-          }
-        });
+      
+      // Iterar sobre el array de objetos de mesa
+      data.forEach(mesaObj => {
+        // Verificar que hay órdenes para esta mesa
+        if (mesaObj.ordenes && Array.isArray(mesaObj.ordenes)) {
+          mesaObj.ordenes.forEach(order => {
+            // Solo incluir órdenes donde listo_a_pagar es false
+            if (order.listo_a_pagar === false) {
+              // Añadir el mesa_id al objeto order si es necesario
+              order.mesa_id = mesaObj.mesa_id;
+              allOrders.push(order);
+            }
+          });
+        }
       });
 
       // Ordenar las órdenes por fecha y hora (más antiguas primero)
@@ -59,7 +66,7 @@ const BartenderScreen = () => {
   const startPolling = () => {
     const interval = setInterval(() => {
       fetchOrders();
-    }, 30000); // Actualiza cada 30 segundos
+    }, 10000); // Actualiza cada 30 segundos
     
     return () => clearInterval(interval); // Limpia el intervalo cuando el componente se desmonta
   };
